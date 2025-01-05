@@ -3,14 +3,16 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-19 13:09+0000\n"
-"PO-Revision-Date: 2023-04-17 09:07+0000\n"
+"PO-Revision-Date: 2024-07-26 11:40+0000\n"
 "Last-Translator: ol810 <uolega@yandex.ru>\n"
-"Language-Team: Russian <https://translate.webtrees.net/projects/webtrees/webtrees/ru/>\n"
+"Language-Team: Russian <https://translate.webtrees.net/projects/webtrees/"
+"webtrees/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Weblate 4.14.2\n"
 "X-Language: ru_RU\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -156,7 +158,7 @@ msgstr "%1$s–%2$s"
 #: app/Services/RelationshipService.php:2204
 #, php-format
 msgid "%1$s’s %2$s"
-msgstr "%1$sой %2$s"
+msgstr "%1$s бывший/бывшая %2$s"
 
 #. I18N: This is the format string for the time-of-day. See https://php.net/date for codes
 #: app/I18N.php:604
@@ -3293,7 +3295,7 @@ msgstr "Канада"
 #: app/Http/RequestHandlers/SitePreferencesAction.php:61
 #, php-format
 msgid "Cannot write to the folder “%s”."
-msgstr ""
+msgstr "Не удается выполнить запись в папку “%s”."
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:143
@@ -3894,7 +3896,7 @@ msgstr "Подключение к серверу базы данных"
 
 #: resources/views/setup/step-4-database-mysql.phtml:49
 msgid "Connection type"
-msgstr ""
+msgstr "Тип подключения"
 
 #. I18N: Name of a module
 #: app/Module/ContactsFooterModule.php:55
@@ -5542,7 +5544,7 @@ msgstr "Редактировать «ЧаВо» запись"
 #: resources/views/individual-page-menu.phtml:73
 #: resources/views/individual-page-sex.phtml:42
 #: resources/views/individual-page-sex.phtml:44
-msgid "Edit the gender"
+msgid "Edit the sex"
 msgstr "Редактировать пол"
 
 #: resources/views/edit/input-addon-edit-name.phtml:14
@@ -10761,7 +10763,7 @@ msgstr "Старейшие живущие персоны"
 
 #: resources/views/modules/statistics-chart/marriage-age.phtml:39
 msgid "Oldest male"
-msgstr "Самый пожилой мужчина"
+msgstr "Самый старый мужчина"
 
 #: resources/views/modules/statistics-chart/birth-age.phtml:50
 msgid "Oldest mother"
@@ -12434,7 +12436,7 @@ msgstr "Сан Марино"
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:174
 msgid "San Salvador, El Salvador"
-msgstr "Сан - Сальвадор, Сальвадор"
+msgstr "Сан Сальвадор, Сальвадор"
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:175
@@ -13181,7 +13183,7 @@ msgid "Show only females."
 msgstr "Показать только персон женского пола."
 
 #: resources/views/lists/individuals-table.phtml:107
-msgid "Show only individuals for whom the gender is not known."
+msgid "Show only individuals for whom the sex is not known."
 msgstr "Показать только персон, чей пол неизвестен."
 
 #: resources/views/modules/random_media/config.phtml:19
@@ -13809,7 +13811,7 @@ msgstr "Начало диапазона дат"
 
 #: app/Module/StatcounterModule.php:41
 msgid "Statcounter™"
-msgstr "Statcounter™"
+msgstr "Счетчик состояния™"
 
 #: app/CustomTags/GedcomL.php:233 app/CustomTags/PersonalAncestralFile.php:72
 #: app/Gedcom.php:409 app/Gedcom.php:522 app/Gedcom.php:542 app/Gedcom.php:813
@@ -13996,11 +13998,11 @@ msgid "Surnames"
 msgstr "Фамилии"
 
 #: app/SurnameTradition/LithuanianSurnameTradition.php:78
-msgid "Surnames are inflected to indicate an individual’s gender and marital status."
+msgid "Surnames are inflected to indicate an individual’s sex and marital status."
 msgstr "Фамилии склоняются указывая пол и семейное положение персоны."
 
 #: app/SurnameTradition/PolishSurnameTradition.php:68
-msgid "Surnames are inflected to indicate an individual’s gender."
+msgid "Surnames are inflected to indicate an individual’s sex."
 msgstr "Фамилии склонены указывая на пол человека."
 
 #. I18N: Location of an LDS church temple
@@ -14564,7 +14566,7 @@ msgstr "Параметр “1%s” испорчен."
 #: app/Http/RequestHandlers/AdminMediaFileDownload.php:66
 #: app/Http/RequestHandlers/AdminMediaFileThumbnail.php:66
 msgid "The parameter “path” is invalid."
-msgstr ""
+msgstr "Параметр “path” является недопустимым."
 
 #: app/Http/RequestHandlers/SetupWizard.php:379
 msgid "The password needs to be at least six characters long."
@@ -14791,7 +14793,7 @@ msgstr "Для этой персоны нету фактов."
 #: app/Module/IndividualListModule.php:224
 #, php-format
 msgid "There are no individuals with the surname “%s”"
-msgstr ""
+msgstr "Здесь нет людей с фамилией “%s”"
 
 #: app/Http/RequestHandlers/ManageMediaData.php:327
 msgid "There are no links to this media object."
@@ -15178,7 +15180,7 @@ msgstr "На этой странице Вы можете редактирова�
 
 #: app/Http/Exceptions/HttpGoneException.php:35
 msgid "This page has been deleted."
-msgstr ""
+msgstr "Эта страница была удалена."
 
 #: app/Module/HitCountFooterModule.php:113
 #, php-format
@@ -15971,7 +15973,7 @@ msgstr "неизвестно"
 #: resources/xml/reports/individual_ext_report.xml:606
 #: resources/xml/reports/individual_report.xml:388
 #: resources/xml/reports/individual_report.xml:602
-msgctxt "unknown gender"
+msgctxt "unknown sex"
 msgid "Unknown"
 msgstr "Нет данных"
 
@@ -16111,7 +16113,7 @@ msgstr "Использовать sendmail для отправки сообщен
 
 #. I18N: Help text for the “Use silhouettes” configuration setting
 #: resources/views/admin/trees-preferences.phtml:311
-msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the gender of the individual in question."
+msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the sex of the individual in question."
 msgstr "Используется изображение силуэта, если Вы не указали изображение для этой персоны. Изображения силуэта, соответствует типу гендерного пола выбранного лица."
 
 #. I18N: A configuration setting
@@ -16471,7 +16473,9 @@ msgstr "Когда пользователь регистрирует аккау�
 
 #: resources/views/edit/reorder-families.phtml:36
 msgid "When an individual has more than one spouse, you should sort the families in date order."
-msgstr "Если у человека более одного супруга, вам следует отсортировать семьи в порядке дат."
+msgstr ""
+"Если у человека более одного супруга, Вам следует отсортировать семьи в "
+"порядке дат."
 
 #. I18N: Help text for the “Surname tradition” configuration setting
 #: resources/views/admin/trees-preferences.phtml:699
@@ -17206,7 +17210,7 @@ msgstr "Продолжить"
 #: app/Elements/GeneatiqueAct.php:40
 msgctxt "NOUN"
 msgid "copy"
-msgstr ""
+msgstr "копировать"
 
 #. I18N: A button label.
 #: resources/views/admin/trees-create.phtml:57
@@ -17388,7 +17392,7 @@ msgstr "экспорт файла"
 #: app/Elements/GeneatiqueAct.php:42
 msgctxt "NOUN"
 msgid "extract"
-msgstr ""
+msgstr "извлекать"
 
 #: app/Http/RequestHandlers/TreePreferencesPage.php:113
 #: resources/xml/reports/fact_sources.xml:6
@@ -17786,7 +17790,7 @@ msgid "full circle"
 msgstr "полный круг"
 
 #: resources/views/modules/statistics-chart/custom.phtml:88
-msgid "gender"
+msgid "sex"
 msgstr "пол"
 
 #. I18N: Type of location hierarchy
@@ -19517,7 +19521,7 @@ msgstr "список"
 #: app/Elements/GeneatiqueAct.php:39
 #: resources/views/setup/step-4-database-mysql.phtml:58
 msgid "local"
-msgstr ""
+msgstr "местный"
 
 #: app/Http/RequestHandlers/MapDataImportAction.php:193
 #, php-format
@@ -19551,7 +19555,7 @@ msgstr "женился"
 #. I18N: A name taken on marriage - usually the wife takes the husband’s surname
 #: app/Elements/NameType.php:85
 msgid "married name"
-msgstr "Фамилия в замужестве"
+msgstr "фамилия в браке"
 
 #: app/Services/RelationshipService.php:567
 msgctxt "mother’s father"
@@ -19727,7 +19731,7 @@ msgstr "племянник/племянница"
 
 #: resources/views/setup/step-4-database-mysql.phtml:73
 msgid "network"
-msgstr ""
+msgstr "сеть"
 
 #. I18N: A button label, next page
 #: resources/views/admin/data-fix-select.phtml:50
@@ -19892,7 +19896,7 @@ msgstr "из"
 
 #: app/Elements/GeneatiqueAct.php:38
 msgid "online"
-msgstr ""
+msgstr "онлайн"
 
 #: app/Services/RelationshipService.php:353
 msgid "parent"
@@ -19905,12 +19909,12 @@ msgstr "партнер"
 #: app/Services/RelationshipService.php:400
 msgctxt "FEMALE"
 msgid "partner"
-msgstr "партнер"
+msgstr "партнер-женщина"
 
 #: app/Services/RelationshipService.php:376
 msgctxt "MALE"
 msgid "partner"
-msgstr "партнер"
+msgstr "партнер-мужчина"
 
 #: app/SurnameTradition/PaternalSurnameTradition.php:38
 msgctxt "Surname tradition"
@@ -19948,7 +19952,7 @@ msgstr "процент"
 
 #: app/Elements/GeneatiqueAct.php:41
 msgid "photocopy"
-msgstr ""
+msgstr "фотокопия"
 
 #. I18N: https://en.wikipedia.org/wiki/Plain_text
 #: app/Http/RequestHandlers/TreePreferencesPage.php:106
@@ -20920,7 +20924,7 @@ msgstr "жена"
 #. I18N: Name of a theme.
 #: app/Module/XeneaTheme.php:39
 msgid "xenea"
-msgstr "xenea"
+msgstr "ксения"
 
 #: resources/views/modules/timeline-chart/chart.phtml:145
 msgid "years"
@@ -21050,7 +21054,7 @@ msgctxt "Unknown surname"
 msgid "…"
 msgstr "…"
 
-#~ msgid " per gender"
+#~ msgid " per sex"
 #~ msgstr " по полу"
 
 #~ msgid " per time period"
@@ -22772,7 +22776,7 @@ msgstr "…"
 #~ msgid "This option controls whether or not to automatically expand the <i>Events of close relatives</i> list."
 #~ msgstr "Этот паарметр контролирует, следует ли автоматически расширять список <i>События близких родственников</i>."
 
-#~ msgid "This option controls whether or not to show the individual’s gender icon on charts.<br><br>Since the gender is also indicated by the color of the box, this option doesn’t conceal the gender. The option simply removes some duplicate information from the box."
+#~ msgid "This option controls whether or not to show the individual’s sex icon on charts.<br><br>Since the sex is also indicated by the color of the box, this option doesn’t conceal the sex. The option simply removes some duplicate information from the box."
 #~ msgstr "Этот параметр определяет, показывать или нет иконку пола человека в графиках.<br><br>Так как на половую принадлежность также указывает цвет окна, этот параметр не скрывает пол. Этот паарметр просто удаляет некоторые повторяющиеся данные из визитки."
 
 #~ msgid "This option indicates whether the pedigree chart should be generated in landscape or portrait mode."

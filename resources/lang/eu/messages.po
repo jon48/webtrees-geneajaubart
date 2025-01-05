@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-19 13:09+0000\n"
-"PO-Revision-Date: 2024-04-03 08:11+0000\n"
-"Last-Translator: Oskar-Txoperena <o.txoperena@gogotik.com>\n"
+"PO-Revision-Date: 2024-10-07 12:22+0000\n"
+"Last-Translator: Greg Roach <greg@subaqua.co.uk>\n"
 "Language-Team: Basque https://translate.webtrees.net/projects/webtrees/"
 "webtrees/eu/>\n"
 "Language: eu\n"
@@ -3877,7 +3877,7 @@ msgstr "Kontakturako informazioa"
 
 #: resources/views/edit-account-page.phtml:135
 msgid "Contact method"
-msgstr "Nola kontaktatu"
+msgstr "Harremanetan jartzeko modua"
 
 #: app/Http/RequestHandlers/SearchAdvancedPage.php:258
 msgid "Contains"
@@ -5515,7 +5515,7 @@ msgstr "Ohiko galdera editatu"
 #: resources/views/individual-page-menu.phtml:73
 #: resources/views/individual-page-sex.phtml:42
 #: resources/views/individual-page-sex.phtml:44
-msgid "Edit the gender"
+msgid "Edit the sex"
 msgstr "Generoa editatu"
 
 #: resources/views/edit/input-addon-edit-name.phtml:14
@@ -6220,7 +6220,7 @@ msgstr "Senarrarekin familia"
 #: resources/xml/reports/individual_ext_report.xml:245
 #: resources/xml/reports/individual_report.xml:234
 msgid "Family with parents"
-msgstr "Familia gurasoekin"
+msgstr "Familia bere gurasoekin"
 
 #. I18N: “rada” is an Arabic word, pronounced “ra DAH”. It is child-to-parent pedigree, established by wet-nursing.
 #: app/Individual.php:866
@@ -6629,12 +6629,13 @@ msgstr "Informazio gehiagorako, begiratu %s."
 #: app/Module/ContactsFooterModule.php:160
 #, php-format
 msgid "For technical support and information contact %s."
-msgstr "Laguntza teknikoa behar baduzu %srekin kontaktatu."
+msgstr "Laguntza teknikoa behar baduzu, %srekin jarri harremanetan."
 
 #: app/Module/ContactsFooterModule.php:134
 #, php-format
 msgid "For technical support or genealogy questions contact %s."
-msgstr "Laguntza teknikoa edo genealogikoa behar baduzu %srekin kontaktatu."
+msgstr ""
+"Laguntza teknikoa edo genealogikoa behar baduzu %srekin jarri harremanetan."
 
 #. I18N: Help text for the “Show list of family trees” site configuration setting
 #: resources/views/admin/site-preferences.phtml:105
@@ -8509,7 +8510,7 @@ msgstr "Azken aldaketa"
 #: resources/views/admin/control-panel.phtml:212
 #, php-format
 msgid "Last checked %s."
-msgstr "Azken egiaztatuak %s."
+msgstr "Azken egiaztapena %s."
 
 #: app/Module/ReviewChangesModule.php:161
 msgid "Last email reminder was sent "
@@ -9874,7 +9875,7 @@ msgstr "Amaren familia %s-rekin"
 #. I18N: A step-family.
 #: app/Individual.php:906
 msgid "Mother’s family with an unknown individual"
-msgstr "Pertsona ezezagun baten amaren familia"
+msgstr "Amaren familia, pertsona ezezagun batekin"
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:140
@@ -13038,7 +13039,7 @@ msgstr "Ohar guztiak ikusi"
 
 #: app/Module/PlaceHierarchyListModule.php:201
 msgid "Show all places in a list"
-msgstr "Leku guztiak ikusi zerrenda batean"
+msgstr "Leku guztien zerrenda ikusi"
 
 #: resources/views/modules/sources_tab/tab.phtml:26
 msgid "Show all sources"
@@ -13152,7 +13153,7 @@ msgid "Show only females."
 msgstr "Emakumezkoak ikusi bakarrik."
 
 #: resources/views/lists/individuals-table.phtml:107
-msgid "Show only individuals for whom the gender is not known."
+msgid "Show only individuals for whom the sex is not known."
 msgstr "Genero ezezaguna duten pertsonak ikusi bakarrik."
 
 #: resources/views/modules/random_media/config.phtml:19
@@ -13967,11 +13968,11 @@ msgid "Surnames"
 msgstr "Abizenak"
 
 #: app/SurnameTradition/LithuanianSurnameTradition.php:78
-msgid "Surnames are inflected to indicate an individual’s gender and marital status."
+msgid "Surnames are inflected to indicate an individual’s sex and marital status."
 msgstr "Abizenak deklinatu egiten dira generoa eta egoera zibila zehazteko."
 
 #: app/SurnameTradition/PolishSurnameTradition.php:68
-msgid "Surnames are inflected to indicate an individual’s gender."
+msgid "Surnames are inflected to indicate an individual’s sex."
 msgstr "Abizenak deklinatu egiten dira pertsonaren generoa zehazteko."
 
 #. I18N: Location of an LDS church temple
@@ -14118,7 +14119,7 @@ msgstr "Urdin berdexka"
 #. I18N: A configuration setting
 #: resources/views/admin/trees-preferences.phtml:175
 msgid "Technical help contact"
-msgstr "Kontaktatu laguntza teknikorako"
+msgstr "Jarri harremanetan laguntza teknikorako"
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:195
@@ -14419,12 +14420,13 @@ msgstr "Elementu honentzako laguntza-testoa ez da idatzi."
 #. I18N: Help text for the “Technical help contact” configuration setting
 #: resources/views/admin/trees-preferences.phtml:187
 msgid "The individual to be contacted about technical questions or errors encountered on your website."
-msgstr "Gai tekniko eta orrian aurkitutako akatsei buruz kontaktatu beharreko pertsona."
+msgstr "Norekin jarri harremanetan web orriaren akats teknikoak bideratzeko."
 
 #. I18N: Help text for the “Genealogy contact” configuration setting
 #: resources/views/admin/trees-preferences.phtml:167
 msgid "The individual to contact about the genealogy data on this website."
-msgstr "Zuhaitz genealogikoei buruz kontaktatu beharreko pertsona."
+msgstr ""
+"Norekin jarri harremanetan zuhaitz genealogikoari buruzko gaiak bideratzeko."
 
 #. I18N: %s are names of records, such as sources, repositories or individuals
 #: app/Http/RequestHandlers/DeleteRecord.php:92
@@ -14693,7 +14695,9 @@ msgstr "%s erabiltzailea ezabatu da."
 #: resources/views/emails/register-notify-html.phtml:41
 #: resources/views/emails/register-notify-text.phtml:32
 msgid "The user has been sent an email with the information necessary to confirm the access request."
-msgstr "Erabitzalieak mezu elektronikoa bidali du, sarrera eskaera konfirmatzeko beharrezko den informazioarekin."
+msgstr ""
+"Erabiltzaileak mezu elektronikoa bidali du, sarrera eskaera konfirmatzeko "
+"beharrezko den informazioarekin."
 
 #: app/Http/RequestHandlers/LoginAction.php:115
 #: app/Http/RequestHandlers/LoginAction.php:120
@@ -15936,7 +15940,7 @@ msgstr "Ezezaguna"
 #: resources/xml/reports/individual_ext_report.xml:606
 #: resources/xml/reports/individual_report.xml:388
 #: resources/xml/reports/individual_report.xml:602
-msgctxt "unknown gender"
+msgctxt "unknown sex"
 msgid "Unknown"
 msgstr "Ezezaguna"
 
@@ -16075,7 +16079,7 @@ msgstr "Sendmail erabili mezuak bidaltzeko"
 
 #. I18N: Help text for the “Use silhouettes” configuration setting
 #: resources/views/admin/trees-preferences.phtml:311
-msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the gender of the individual in question."
+msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the sex of the individual in question."
 msgstr "Silueta bat erabiliko da erlazionatutako irudirik ez duen pertsonentzat. Erabilitako siluetak pertsonen generoari egokituak daude."
 
 #. I18N: A configuration setting
@@ -16282,7 +16286,7 @@ msgstr "Egun hau ikusi"
 #: resources/views/statistics/families/top10-list-age.phtml:23
 #: resources/views/statistics/families/top10-nolist-age.phtml:25
 msgid "View this family"
-msgstr "bere familia ikusi nahi"
+msgstr "Familia hau ikusi"
 
 #: app/Module/ModuleMapLinkTrait.php:62
 #, php-format
@@ -16712,7 +16716,11 @@ msgstr "Ezin duzu erabiltzaile bat onartu bere helbide elektronikoa zuzena dela 
 #: resources/views/emails/register-notify-html.phtml:45
 #: resources/views/emails/register-notify-text.phtml:34
 msgid "You will be informed by email when this prospective user has confirmed the request. You can then complete the process by activating the username. The new user will not be able to sign in until you activate the account."
-msgstr "Erabiltzailea izan litekeenak, eskaera konfirmatu eta onartzen denean, korreo elektronikoz informatuko zaio. Ondotik erabiltzaile-izenaren aktibazioa burutzen ahal du. Erabiltzaile berriak ezin izanen du saiorik ireki administratzaileak kontua gaitu arte."
+msgstr ""
+"Erabiltzailea izan litekeenari, behin eskaera onartutakoan, korreo "
+"elektronikoz informatuko zaio. Ondotik aktibatzen ahal izanen da "
+"erabiltzaile-kontua. Erabiltzaile berriak ezin izanen du saiorik ireki "
+"administratzaileak kontua gaitu arte."
 
 #: resources/views/setup/step-5-administrator.phtml:73
 msgid "You will use this to sign in to webtrees."
@@ -16796,7 +16804,7 @@ msgstr "Webtrees-en bertsio zaharrak _WT_OBJE_SORT etiketak erabiltzen zituzten 
 #: app/Date.php:185
 #, php-format
 msgid "about %s"
-msgstr "%s inguruan"
+msgstr "%saren inguruan"
 
 #. I18N: %1$s is “accept”, %2$s is “reject”. These are links.
 #: resources/views/family-page-pending.phtml:25
@@ -17749,7 +17757,7 @@ msgid "full circle"
 msgstr "Borobil osoa"
 
 #: resources/views/modules/statistics-chart/custom.phtml:88
-msgid "gender"
+msgid "sex"
 msgstr "generoa"
 
 #. I18N: Type of location hierarchy

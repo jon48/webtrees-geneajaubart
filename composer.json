@@ -42,7 +42,7 @@
 		}
 	},
 	"require" : {
-        "php": "7.4 - 8.3",
+        "php": "7.4 - 8.4",
 		"ext-ctype" : "*",
 		"ext-curl" : "*",
         "ext-fileinfo": "*",
@@ -56,14 +56,14 @@
 		"ext-session" : "*",
 		"ext-xml" : "*",
         "aura/router": "3.3.0",
-        "doctrine/dbal": "3.8.3",
-        "ezyang/htmlpurifier": "4.17.0",
+        "doctrine/dbal": "3.9.3",
+        "ezyang/htmlpurifier": "4.18.0",
 		"fig/http-message-util" : "1.1.5",
 		"fisharebest/algorithm" : "1.6.0",
         "fisharebest/ext-calendar": "2.6.0",
 		"fisharebest/flysystem-chroot-adapter" : "2.0.0",
         "fisharebest/localization": "1.17.0",
-        "guzzlehttp/guzzle": "7.8.1",
+        "guzzlehttp/guzzle": "7.9.2",
         "illuminate/container": "8.83.27",
         "illuminate/database": "8.83.27",
         "illuminate/support": "8.83.27",
@@ -72,13 +72,13 @@
 		"jon48/webtrees-lib" : "dev-main-2.1 as dev-main",
 		"jon48/webtrees-mod-maj-geodata-france" : "dev-main",
 		"jon48/webtrees-mod-translationtool" : "dev-main",
-        "league/commonmark": "2.4.2",
+        "league/commonmark": "2.5.3",
         "league/flysystem": "2.5.0",
 		"league/flysystem-ziparchive" : "2.3.1",
 		"middlewares/client-ip" : "2.0.1",
-        "mlocati/ip-lib": "1.18.0",
-        "nesbot/carbon": "2.72.3",
-        "nyholm/psr7": "1.8.1",
+        "mlocati/ip-lib": "1.18.1",
+        "nesbot/carbon": "2.72.5",
+        "nyholm/psr7": "1.8.2",
         "nyholm/psr7-server": "1.1.0",
 		"oomphinc/composer-installers-extender" : "^2.0",
 		"oscarotero/middleland" : "1.0.1",
@@ -87,13 +87,13 @@
         "psr/http-server-handler": "1.0.2",
         "psr/http-server-middleware": "1.0.2",
 		"ramsey/uuid" : "4.2.3",
-        "sabre/vobject": "4.5.4",
-        "symfony/cache": "5.4.36",
-        "symfony/expression-language": "5.4.35",
-        "symfony/mailer": "5.4.36",
-        "symfony/polyfill-mbstring": "1.29.0",
-        "symfony/polyfill-php80": "1.29.0",
-        "tecnickcom/tcpdf": "6.7.4"
+        "sabre/vobject": "4.5.6",
+        "symfony/cache": "5.4.46",
+        "symfony/expression-language": "5.4.45",
+        "symfony/mailer": "5.4.45",
+        "symfony/polyfill-mbstring": "1.31.0",
+        "symfony/polyfill-php80": "1.31.0",
+        "tecnickcom/tcpdf": "6.7.7"
 	},
 	"require-dev" : {
 		"ext-dom": "*",
@@ -101,11 +101,11 @@
 		"ext-pdo_sqlite": "*",
 		"ext-sqlite3": "*",
 		"bamarni/composer-bin-plugin": "^1.8",
-		"composer/composer": "2.7.2",
+        "composer/composer": "2.8.3",
 		"consolidation/robo": "^3.0",
 		"league/flysystem-memory": "2.0.6",
 		"php-coveralls/php-coveralls": "2.7.0",
-		"phpunit/phpunit": "9.6.18"
+        "phpunit/phpunit": "9.6.21"
 	},
 	"suggest" : {
 		"ext-imagick" : "Required to generate thumbnail images",
@@ -151,23 +151,15 @@
 			"~/.composer/vendor/bin/phpcs --colors --extensions=css resources/css"
 		],
 		"webtrees:phpstan" : [
-			"@composer global require --quiet phpstan/phpstan=*",
-			"@composer global require --quiet phpstan/extension-installer=*",
-			"@composer global require --quiet phpstan/phpstan-deprecation-rules=*",
-			"@composer global require --quiet phpstan/phpstan-strict-rules=*",
-			"@composer global require --quiet phpstan/phpstan-phpunit=*",
+            "@composer global require --quiet phpstan/phpstan=* phpstan/extension-installer=* phpstan/phpstan-deprecation-rules=* phpstan/phpstan-strict-rules=* phpstan/phpstan-phpunit=*",
 			"@composer install --quiet",
-            "~/.composer/vendor/bin/phpstan analyze --memory-limit=-1 --xdebug --level=max index.php app",
+            "~/.composer/vendor/bin/phpstan analyze -v --memory-limit=-1",
 			"@composer install --no-dev --quiet"
 		],
 		"webtrees:phpstan-baseline" : [
-			"@composer global require --quiet phpstan/phpstan=*",
-			"@composer global require --quiet phpstan/extension-installer=*",
-			"@composer global require --quiet phpstan/phpstan-deprecation-rules=*",
-			"@composer global require --quiet phpstan/phpstan-strict-rules=*",
-			"@composer global require --quiet phpstan/phpstan-phpunit=*",
+            "@composer global require --quiet phpstan/phpstan=* phpstan/extension-installer=* phpstan/phpstan-deprecation-rules=* phpstan/phpstan-strict-rules=* phpstan/phpstan-phpunit=*",
 			"@composer install --quiet",
-			"~/.composer/vendor/bin/phpstan analyze --level=max --generate-baseline=phpstan-baseline.neon index.php app",
+            "~/.composer/vendor/bin/phpstan analyze --memory-limit=-1 --generate-baseline=phpstan-baseline.neon",
 			"@composer install --no-dev --quiet"
 		],
 		"webtrees:psalm" : [
@@ -203,10 +195,9 @@
         "ci" : [
             "@composer validate",
             "@composer install --quiet",
-            "@composer global require --quiet icanhazstring/composer-unused=*",
-            "~/.composer/vendor/bin/composer-unused",
-            "@composer global require --quiet maglnet/composer-require-checker=*",
-            "~/.composer/vendor/bin/composer-require-checker check"
+            "@composer webtrees:phpcs",
+            "@composer webtrees:phpstan",
+            "@composer webtrees:test"
 		]
 	},
 	"scripts-descriptions" : {

@@ -3,9 +3,10 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-19 13:09+0000\n"
-"PO-Revision-Date: 2024-01-28 18:36+0000\n"
+"PO-Revision-Date: 2024-10-16 20:45+0000\n"
 "Last-Translator: Fredrik Ekdahl <fekdahl@gmail.com>\n"
-"Language-Team: Swedish <https://translate.webtrees.net/projects/webtrees/webtrees/sv/>\n"
+"Language-Team: Swedish <https://translate.webtrees.net/projects/webtrees/"
+"webtrees/sv/>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -654,7 +655,12 @@ msgstr "<standardtema>"
 
 #: resources/views/register-page.phtml:28
 msgid "<p>Notice: By completing and submitting this form, you agree:</p><ul><li>to protect the privacy of living individuals listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our website.</li></ul>"
-msgstr "<p>Meddelande: Genom att fylla i och skicka det här formuläret godkänner du:</p><ul><li>att skydda integritetet för levande personer som anges på vår webbplats;</li><li>och i textrutan nedan, att förklara till vem du är släkt, eller att ge oss information om någon som bör listas på vår webbplats.</li></ul>\""
+msgstr ""
+"<p>Meddelande: Genom att fylla i och skicka det här formuläret godkänner "
+"du:</p><ul><li>att skydda integritetet för levande personer som anges på vår "
+"webbplats;</li><li>och i textrutan nedan, att förklara till vem du är släkt, "
+"eller att ge oss information om någon som bör listas på vår "
+"webbplats.</li></ul>"
 
 #. I18N: URL = web address
 #: resources/views/modals/media-file-fields.phtml:36
@@ -834,7 +840,7 @@ msgstr "Lista över de mest populära förnamnen."
 #. I18N: Description of the “Top surnames” module
 #: app/Module/TopSurnamesModule.php:83
 msgid "A list of the most popular surnames."
-msgstr "En lista över de mest populära släktnamnen."
+msgstr "En lista över de populäraste efternamnen."
 
 #. I18N: Description of the “Most viewed pages” module
 #: app/Module/TopPageViewsModule.php:63
@@ -869,7 +875,7 @@ msgstr "En ny version av webtrees finns tillgänglig."
 #: app/Http/RequestHandlers/PasswordRequestAction.php:119
 #, php-format
 msgid "A password reset link has been sent to “%s”."
-msgstr "En länk för att nollställa lösenordet har skickats till \"%s\"."
+msgstr "En länk för att nollställa lösenordet har skickats till ”%s”."
 
 #. I18N: Description of the “Journal” module
 #: app/Module/UserJournalModule.php:64
@@ -2055,7 +2061,7 @@ msgstr "Akvamarin"
 #: resources/views/edit/icon-fact-delete.phtml:21
 #, php-format
 msgid "Are you sure you want to delete the link to “%s”?"
-msgstr "Är du säker på att du vill ta bort länken till \"%s\"?"
+msgstr "Är du säker på att du vill ta bort länken till ”%s”?"
 
 #: resources/views/individual-page-name.phtml:90
 #: resources/views/media-page-details.phtml:38
@@ -2568,7 +2574,7 @@ msgstr "Bern, Schweiz"
 
 #: app/Elements/RelationIsDescriptor.php:96
 msgid "Best man"
-msgstr "Best man"
+msgstr "Bröllopsmarskalk"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:111
@@ -3270,7 +3276,7 @@ msgstr "Kanada"
 #: app/Http/RequestHandlers/SitePreferencesAction.php:61
 #, php-format
 msgid "Cannot write to the folder “%s”."
-msgstr ""
+msgstr "Kan inte skriva till mappen ”%s”."
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:143
@@ -3870,7 +3876,7 @@ msgstr "Anslutning till databas-servern"
 
 #: resources/views/setup/step-4-database-mysql.phtml:49
 msgid "Connection type"
-msgstr ""
+msgstr "Kopplingstyp"
 
 #. I18N: Name of a module
 #: app/Module/ContactsFooterModule.php:55
@@ -5518,7 +5524,7 @@ msgstr "Redigera Vanliga frågan"
 #: resources/views/individual-page-menu.phtml:73
 #: resources/views/individual-page-sex.phtml:42
 #: resources/views/individual-page-sex.phtml:44
-msgid "Edit the gender"
+msgid "Edit the sex"
 msgstr "Redigera kön"
 
 #: resources/views/edit/input-addon-edit-name.phtml:14
@@ -6632,7 +6638,7 @@ msgstr "Mer information finns i %s."
 #: app/Module/ContactsFooterModule.php:160
 #, php-format
 msgid "For technical support and information contact %s."
-msgstr "För teknisk stöd och information kontakta %s."
+msgstr "För tekniskt stöd och information kontakta %s."
 
 #: app/Module/ContactsFooterModule.php:134
 #, php-format
@@ -7768,7 +7774,9 @@ msgstr "Historiska händelser detta år…"
 #. I18N: "thumbs" is fixed text. Do not change it.
 #: resources/views/admin/webtrees1-thumbnails.phtml:21
 msgid "In webtrees version 1, you could add custom thumbnails to media objects by creating files in the “thumbs” folders."
-msgstr "I webtrees version 1 kan du lägga till egna miniatyrbilder till medieobjekt genom att skapa filer i \"thumbs\" mapparna."
+msgstr ""
+"I webtrees version 1 kan du lägga till egna miniatyrbilder till medieobjekt "
+"genom att skapa filer i ”thumbs”-mapparna."
 
 #: resources/views/admin/webtrees1-thumbnails.phtml:23
 msgid "In webtrees version 2, custom thumbnails are stored as a second media file in the same media object."
@@ -8287,7 +8295,7 @@ msgstr "Håll öppen"
 #: resources/views/edit/edit-fact.phtml:35
 #: resources/views/edit/edit-record.phtml:34
 msgid "Keep the existing “last change” information"
-msgstr "Behåll den befintliga ”senaste ändringen” informationen"
+msgstr "Behåll befintlig information om ”senaste ändringen”"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:278
@@ -10789,7 +10797,7 @@ msgstr "OpenRouteService"
 
 #: app/Module/MapLinkOpenStreetMap.php:41 app/Module/OpenStreetMap.php:51
 msgid "OpenStreetMap™"
-msgstr "\"OpenStreetMap™\""
+msgstr "OpenStreetMap™"
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:152
@@ -11226,7 +11234,9 @@ msgstr "Ortnamn kan ändras över tid. I släktforskning är det vanligt att anv
 
 #: resources/views/help/place.phtml:10
 msgid "Place names should be entered as a comma-separated list, starting with the smallest place and ending with the country. For example, “Westminster, London, England”."
-msgstr "Ortnamn ska anges som en kommaseparerad lista, som börjar med den minsta orten och slutar med landet. Till exempel \"Kungsholmen, Stockholm, Sverige\"."
+msgstr ""
+"Ortnamn ska anges som en kommaseparerad lista, som börjar med den minsta "
+"orten och slutar med landet. Till exempel ”Kungsholmen, Stockholm, Sverige”."
 
 #: app/Gedcom.php:588
 msgid "Place of LDS baptism"
@@ -13050,7 +13060,7 @@ msgstr "Visa alla källor"
 #. I18N: an age indicator, which can be dragged around the screen
 #: resources/views/modules/timeline-chart/page.phtml:83
 msgid "Show an age cursor"
-msgstr "Visa en ålder markör"
+msgstr "Visa en åldersmarkör"
 
 #: resources/xml/reports/ahnentafel_report.xml:12
 msgid "Show children of ancestors"
@@ -13155,7 +13165,7 @@ msgid "Show only females."
 msgstr "Visa endast kvinnor."
 
 #: resources/views/lists/individuals-table.phtml:107
-msgid "Show only individuals for whom the gender is not known."
+msgid "Show only individuals for whom the sex is not known."
 msgstr "Visa endast personer som inte har ett känt kön."
 
 #: resources/views/modules/random_media/config.phtml:19
@@ -13274,7 +13284,7 @@ msgstr "Visa personlistan"
 
 #: app/Module/IndividualListModule.php:348
 msgid "Show the list of surnames"
-msgstr "Visa släktnamnslistan"
+msgstr "Visa efternamnslistan"
 
 #: app/Http/RequestHandlers/ModulesMapLinksPage.php:44
 #: app/Module/ModuleMapLinkTrait.php:49
@@ -13970,11 +13980,11 @@ msgid "Surnames"
 msgstr "Efternamn"
 
 #: app/SurnameTradition/LithuanianSurnameTradition.php:78
-msgid "Surnames are inflected to indicate an individual’s gender and marital status."
+msgid "Surnames are inflected to indicate an individual’s sex and marital status."
 msgstr "Efternamn böjs för att indikera en persons kön och civilstånd."
 
 #: app/SurnameTradition/PolishSurnameTradition.php:68
-msgid "Surnames are inflected to indicate an individual’s gender."
+msgid "Surnames are inflected to indicate an individual’s sex."
 msgstr "Efternamn böjs för att indikera en persons kön."
 
 #. I18N: Location of an LDS church temple
@@ -14283,7 +14293,7 @@ msgstr "Datumet och tiden för den senaste uppdateringen"
 #: app/Http/RequestHandlers/MapDataSave.php:101
 #, php-format
 msgid "The details for “%s” have been updated."
-msgstr "Detaljerna för \"%s\" har uppdaterats."
+msgstr "Detaljerna för ”%s” har uppdaterats."
 
 #. I18N: %s is a filename
 #: app/Http/RequestHandlers/ExportGedcomServer.php:84
@@ -14509,12 +14519,16 @@ msgstr "Modulen ”%s” är aktiverad."
 #. I18N: Help text for the “Quick family facts” configuration setting
 #: resources/views/admin/trees-preferences.phtml:684
 msgid "The most common family facts and events are listed separately, so that they can be added more easily."
-msgstr "De vanligaste familje fakta och händelser listas separat, så att de kan tillsättas lättare."
+msgstr ""
+"De vanligaste familjefaktumen och -händelser listas separat, så att de kan "
+"läggas till lättare."
 
 #. I18N: Help text for the “Quick individual facts” configuration setting
 #: resources/views/admin/trees-preferences.phtml:659
 msgid "The most common individual facts and events are listed separately, so that they can be added more easily."
-msgstr "De vanligaste personfakta och -händelser listas separat, så att de kan tillsättas lättare."
+msgstr ""
+"De vanligaste personfaktumen och -händelser listas separat, så att de kan "
+"läggas till lättare."
 
 #: resources/views/admin/site-registration.phtml:56
 msgid "The new user will be asked to confirm their email address before the account is created."
@@ -14538,7 +14552,7 @@ msgstr "Parametern ”%s” saknas."
 #: app/Http/RequestHandlers/AdminMediaFileDownload.php:66
 #: app/Http/RequestHandlers/AdminMediaFileThumbnail.php:66
 msgid "The parameter “path” is invalid."
-msgstr ""
+msgstr "Parametern ”sökväg” är ogiltig."
 
 #: app/Http/RequestHandlers/SetupWizard.php:379
 msgid "The password needs to be at least six characters long."
@@ -14764,7 +14778,7 @@ msgstr "Det finns inga fakta om denna person."
 #: app/Module/IndividualListModule.php:224
 #, php-format
 msgid "There are no individuals with the surname “%s”"
-msgstr ""
+msgstr "Det finns inga personer med efternamnet ”%s”"
 
 #: app/Http/RequestHandlers/ManageMediaData.php:327
 msgid "There are no links to this media object."
@@ -14842,7 +14856,7 @@ msgstr "Thermidor"
 
 #: resources/views/modules/privacy-policy/page.phtml:39
 msgid "These cookies are “essential”, and do not require consent."
-msgstr "Dessa kakor är \"väsentliga\" och kräver inte samtycke."
+msgstr "Dessa kakor är ”väsentliga” och kräver inte samtycke."
 
 #: resources/views/admin/trees-unconnected.phtml:39
 #, php-format
@@ -15135,7 +15149,10 @@ msgstr "Detta alternativ kommer att göra det enklare för användare att ladda 
 #. I18N: Help text for the “Show private relationships” configuration setting
 #: resources/views/admin/trees-privacy.phtml:152
 msgid "This option will retain family links in private records. This means that you will see empty “private” boxes on the pedigree chart and on other charts with private individuals."
-msgstr "Detta val kommer att behålla familjelänkar i privata poster. Detta innebär att du kommer att se tomma \"privat\" rutor på antavlan och på andra diagram för privatpersoner."
+msgstr ""
+"Detta val kommer att behålla familjelänkar i privata poster. Detta innebär "
+"att du kommer att se tomma ”privat” rutor på antavlan och på andra diagram "
+"för privata personer."
 
 #. I18N: Help text for the “Show names of private individuals” configuration setting
 #: resources/views/admin/trees-privacy.phtml:133
@@ -15149,7 +15166,7 @@ msgstr "Denna sida ger dig möjlighet att kringgå vanliga formulär och rediger
 
 #: app/Http/Exceptions/HttpGoneException.php:35
 msgid "This page has been deleted."
-msgstr ""
+msgstr "Denna sida har tagits bort."
 
 #: app/Module/HitCountFooterModule.php:113
 #, php-format
@@ -15197,7 +15214,9 @@ msgstr "Detta arkiv existerar inte eller så saknar du rättigheter att se det."
 
 #: resources/views/modules/privacy-policy/page.phtml:28
 msgid "This research is a “legitimate interest” under article 6(f) of the EU General Data Protection Regulations."
-msgstr "Denna forskning är ett \"legitimt intresse\" enligt artikel 6(f) i EU:s allmänna dataskyddsförordningar."
+msgstr ""
+"Denna forskning är ett ”legitimt intresse” enligt artikel 6(f) i EU:s "
+"allmänna dataskyddsförordningar (GDPR)."
 
 #: resources/views/admin/users-edit.phtml:263
 msgid "This role has all the permissions of the editor role, plus permission to accept/reject changes made by other users."
@@ -15533,15 +15552,15 @@ msgstr "För många förfrågningar. Försök igen senare."
 msgid "Top %s given name"
 msgid_plural "Top %s given names"
 msgstr[0] "Vanligast förnamn"
-msgstr[1] "De %s vanligaste förnamn"
+msgstr[1] "De %s vanligaste förnamnen"
 
 #. I18N: Title for a list of the most common surnames, %s is a number. Note that a separate translation exists when %s is 1
 #: app/Module/TopSurnamesModule.php:196
 #, php-format
 msgid "Top %s surname"
 msgid_plural "Top %s surnames"
-msgstr[0] "Vanligaste släktnamn"
-msgstr[1] "%s vanligaste släktnamn"
+msgstr[0] "Vanligaste efternamn"
+msgstr[1] "De %s vanligaste efternamnen"
 
 #. I18N: i.e. most popular given name.
 #: app/Module/TopGivenNamesModule.php:102
@@ -15939,7 +15958,7 @@ msgstr "Okänd"
 #: resources/xml/reports/individual_ext_report.xml:606
 #: resources/xml/reports/individual_report.xml:388
 #: resources/xml/reports/individual_report.xml:602
-msgctxt "unknown gender"
+msgctxt "unknown sex"
 msgid "Unknown"
 msgstr "Okänt"
 
@@ -16028,7 +16047,9 @@ msgstr "Använd SMTP för sända meddelanden"
 
 #: app/Module/FixSearchAndReplace.php:101
 msgid "Use a “?” to match a single character, use “*” to match zero or more characters."
-msgstr "Använd \"?\" för att matcha ett tecken, använd \"*\" för att matcha noll eller fler tecken."
+msgstr ""
+"Använd ”?” för att matcha ett tecken, använd ”*” för att matcha noll eller "
+"fler tecken."
 
 #: app/Module/ModuleMapGeoLocationTrait.php:56
 msgid "Use an external service to find locations."
@@ -16078,7 +16099,7 @@ msgstr "Använd sendmail för att skicka meddelanden"
 
 #. I18N: Help text for the “Use silhouettes” configuration setting
 #: resources/views/admin/trees-preferences.phtml:311
-msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the gender of the individual in question."
+msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the sex of the individual in question."
 msgstr "Använd silhuettbilder när ingen bild för denna person har specificerats. De bilder som används är könspecifika."
 
 #. I18N: A configuration setting
@@ -16088,7 +16109,7 @@ msgstr "Använd siluettbilder"
 
 #: app/Http/RequestHandlers/CopyFact.php:71
 msgid "Use the “edit“ menu to paste this into another record."
-msgstr "Använd \"redigera\"-menyn för att klistra in detta i en annan post."
+msgstr "Använd ”redigera”-menyn för att klistra in detta i en annan post."
 
 #: resources/views/register-page.phtml:91
 msgid "Use this field to tell the site administrator why you are requesting an account and how you are related to the genealogy displayed on this site. You can also use this to enter any other comments you may have for the site administrator."
@@ -16605,7 +16626,9 @@ msgstr "Du kan nedladda en kopia av GEDCOM-specifikationen från %s."
 
 #: resources/views/modules/privacy-policy/page.phtml:66
 msgid "You can opt out of tracking by setting the “Do Not Track” header in your browser preferences."
-msgstr "Du kan välja bort spårning genom att ställa in rubriken \"Spåra inte\" i dina webbläsarinställningar."
+msgstr ""
+"Du kan välja bort spårning genom att ställa in rubriken ”Spåra inte” i dina "
+"webbläsarinställningar."
 
 #: resources/views/admin/trees-renumber.phtml:28
 msgid "You can renumber the records in a family tree, so that these internal reference numbers are not duplicated in any other family tree."
@@ -17173,7 +17196,7 @@ msgstr "fortsätt"
 #: app/Elements/GeneatiqueAct.php:40
 msgctxt "NOUN"
 msgid "copy"
-msgstr ""
+msgstr "kopia"
 
 #. I18N: A button label.
 #: resources/views/admin/trees-create.phtml:57
@@ -17355,7 +17378,7 @@ msgstr "exportera filen"
 #: app/Elements/GeneatiqueAct.php:42
 msgctxt "NOUN"
 msgid "extract"
-msgstr ""
+msgstr "utdrag"
 
 #: app/Http/RequestHandlers/TreePreferencesPage.php:113
 #: resources/xml/reports/fact_sources.xml:6
@@ -17752,7 +17775,7 @@ msgid "full circle"
 msgstr "helcirkel"
 
 #: resources/views/modules/statistics-chart/custom.phtml:88
-msgid "gender"
+msgid "sex"
 msgstr "kön"
 
 #. I18N: Type of location hierarchy
@@ -19483,7 +19506,7 @@ msgstr "lista"
 #: app/Elements/GeneatiqueAct.php:39
 #: resources/views/setup/step-4-database-mysql.phtml:58
 msgid "local"
-msgstr ""
+msgstr "lokal"
 
 #: app/Http/RequestHandlers/MapDataImportAction.php:193
 #, php-format
@@ -19692,7 +19715,7 @@ msgstr "hustrus systers barn"
 
 #: resources/views/setup/step-4-database-mysql.phtml:73
 msgid "network"
-msgstr ""
+msgstr "nätverk"
 
 #. I18N: A button label, next page
 #: resources/views/admin/data-fix-select.phtml:50
@@ -19857,7 +19880,7 @@ msgstr "av"
 
 #: app/Elements/GeneatiqueAct.php:38
 msgid "online"
-msgstr ""
+msgstr "online"
 
 #: app/Services/RelationshipService.php:353
 msgid "parent"
@@ -19913,7 +19936,7 @@ msgstr "procent"
 
 #: app/Elements/GeneatiqueAct.php:41
 msgid "photocopy"
-msgstr ""
+msgstr "fotokopia"
 
 #. I18N: https://en.wikipedia.org/wiki/Plain_text
 #: app/Http/RequestHandlers/TreePreferencesPage.php:106
@@ -20966,12 +20989,12 @@ msgstr "Åland"
 #: app/Http/RequestHandlers/CheckTree.php:291
 #, php-format
 msgid "“%1$s” should be “%2$s”."
-msgstr "\"%1$s\" ska vara \"%2$s\"."
+msgstr "”%1$s” ska vara ”%2$s”."
 
 #: app/Http/RequestHandlers/CopyFact.php:69
 #, php-format
 msgid "“%s“ has been copied to the clipboard."
-msgstr "\"%s\" har kopierats till urklippskorgen."
+msgstr "”%s” har kopierats till urklippskorgen."
 
 #. I18N: %s is the name of a genealogy record
 #: app/Http/RequestHandlers/PendingChangesAcceptRecord.php:63
@@ -20983,7 +21006,10 @@ msgstr "”%s” har tagits bort."
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixPrimaryTag.php:70
 msgid "“Highlighted image” (_PRIM) tags are used by some genealogy applications to indicate the preferred image for an individual. An alternative is to re-order the images so that the preferred one is listed first."
-msgstr "“Markerad bild” (_PRIM) taggar används av vissa släktforskningsprogram för att indikera den föredragna bilden för en person. Ett alternativ är att ordna om bilderna så att den föredragna listas först."
+msgstr ""
+"”Markerad bild” (_PRIM) taggar används av vissa släktforskningsprogram för "
+"att indikera den föredragna bilden för en person. Ett alternativ är att "
+"ordna om bilderna så att den föredragna listas först."
 
 #: app/Individual.php:482 app/Individual.php:486 app/Note.php:101
 #: app/Report/ReportParserGenerate.php:987
@@ -21014,7 +21040,7 @@ msgctxt "Unknown surname"
 msgid "…"
 msgstr "…"
 
-#~ msgid " per gender"
+#~ msgid " per sex"
 #~ msgstr " / kön"
 
 #~ msgid " per time period"
@@ -22814,7 +22840,7 @@ msgstr "…"
 #~ msgid "This option controls whether or not to automatically expand the <i>Events of close relatives</i> list."
 #~ msgstr "Detta val kontrollerar om listan <i>Händelser för nära släktingar</i> ska expanderas automatiskt."
 
-#~ msgid "This option controls whether or not to show the individual’s gender icon on charts.<br><br>Since the gender is also indicated by the color of the box, this option doesn’t conceal the gender. The option simply removes some duplicate information from the box."
+#~ msgid "This option controls whether or not to show the individual’s sex icon on charts.<br><br>Since the sex is also indicated by the color of the box, this option doesn’t conceal the sex. The option simply removes some duplicate information from the box."
 #~ msgstr "Detta alternativ kortollerar om köns-ikon visas eller ej på diagram.<br><br>Eftersom kön också framgår av rutfärgen, kan detta alternativ inte dölja könet. Detta alternativ helt enkelt tar bort dubbla information i rutan."
 
 #~ msgid "This option indicates whether the pedigree chart should be generated in landscape or portrait mode."

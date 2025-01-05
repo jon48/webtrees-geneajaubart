@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-19 13:09+0000\n"
-"PO-Revision-Date: 2024-03-31 08:11+0000\n"
-"Last-Translator: Carmen <carmen@justcarmen.nl>\n"
+"PO-Revision-Date: 2024-11-17 15:38+0000\n"
+"Last-Translator: TheDutchJewel <thedutchjewel@gmail.com>\n"
 "Language-Team: Dutch <https://translate.webtrees.net/projects/webtrees/"
 "webtrees/nl/>\n"
 "Language: nl\n"
@@ -1383,7 +1383,7 @@ msgstr "Voeg een echtgenote toe"
 #: app/Http/RequestHandlers/LinkSpouseToIndividualPage.php:74
 #: resources/views/modules/relatives/tab.phtml:144
 msgid "Add a wife using an existing individual"
-msgstr "Voeg en bestaand persoon als echtgenote toe"
+msgstr "Voeg een bestaand persoon als echtgenote toe"
 
 #. I18N: FAQ = “Frequently Asked Question”
 #: app/Module/FrequentlyAskedQuestionsModule.php:299
@@ -3812,7 +3812,7 @@ msgstr "Commentaar"
 
 #: app/CustomTags/BrothersKeeper.php:63
 msgid "Common law marriage"
-msgstr "Erkend partnerschap"
+msgstr "Geregistreerd partnerschap"
 
 #. I18N: Description of the “Messages” module
 #: app/Module/UserMessagesModule.php:76
@@ -5519,7 +5519,7 @@ msgstr "FAQ wijzigen"
 #: resources/views/individual-page-menu.phtml:73
 #: resources/views/individual-page-sex.phtml:42
 #: resources/views/individual-page-sex.phtml:44
-msgid "Edit the gender"
+msgid "Edit the sex"
 msgstr "Wijzig geslacht"
 
 #: resources/views/edit/input-addon-edit-name.phtml:14
@@ -13156,7 +13156,7 @@ msgid "Show only females."
 msgstr "Toon alleen vrouwen."
 
 #: resources/views/lists/individuals-table.phtml:107
-msgid "Show only individuals for whom the gender is not known."
+msgid "Show only individuals for whom the sex is not known."
 msgstr "Toon alleen personen waarvan het geslacht onbekend is."
 
 #: resources/views/modules/random_media/config.phtml:19
@@ -13971,11 +13971,11 @@ msgid "Surnames"
 msgstr "Achternamen"
 
 #: app/SurnameTradition/LithuanianSurnameTradition.php:78
-msgid "Surnames are inflected to indicate an individual’s gender and marital status."
+msgid "Surnames are inflected to indicate an individual’s sex and marital status."
 msgstr "Achternamen worden verbogen om het geslacht en de burgerlijke staat van een persoon aan te geven."
 
 #: app/SurnameTradition/PolishSurnameTradition.php:68
-msgid "Surnames are inflected to indicate an individual’s gender."
+msgid "Surnames are inflected to indicate an individual’s sex."
 msgstr "Achternamen worden verbogen om het geslacht van een persoon aan te geven."
 
 #. I18N: Location of an LDS church temple
@@ -14732,7 +14732,7 @@ msgstr "De gebruikersnaam vereist voor authenticatie bij de SMTP server."
 #: app/Http/RequestHandlers/SiteRegistrationAction.php:55
 #: app/Http/RequestHandlers/SiteTagsAction.php:69
 msgid "The website preferences have been updated."
-msgstr "De website voorkeuren zijn bijgewerkt."
+msgstr "De websitevoorkeuren zijn bijgewerkt."
 
 #: resources/views/errors/database-error.phtml:22
 #: resources/views/setup/step-6-failed.phtml:22
@@ -15940,7 +15940,7 @@ msgstr "Onbekende"
 #: resources/xml/reports/individual_ext_report.xml:606
 #: resources/xml/reports/individual_report.xml:388
 #: resources/xml/reports/individual_report.xml:602
-msgctxt "unknown gender"
+msgctxt "unknown sex"
 msgid "Unknown"
 msgstr "Onbekend"
 
@@ -16079,7 +16079,7 @@ msgstr "Gebruik sendmail om berichten te versturen"
 
 #. I18N: Help text for the “Use silhouettes” configuration setting
 #: resources/views/admin/trees-preferences.phtml:311
-msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the gender of the individual in question."
+msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the sex of the individual in question."
 msgstr "Gebruik silhouette afbeeldingen wanneer er geen gemarkeerde afbeelding voor een persoon bestaat. De gebruikte afbeeldingen zijn geslachtsafhankelijk."
 
 #. I18N: A configuration setting
@@ -16392,7 +16392,7 @@ msgstr "Website-logboekbestanden"
 #: app/Http/RequestHandlers/SitePreferencesPage.php:65
 #: resources/views/admin/control-panel.phtml:240
 msgid "Website preferences"
-msgstr "Website voorkeuren"
+msgstr "Websitevoorkeuren"
 
 #. I18N: abbreviation for Wednesday
 #: app/Date/AbstractCalendarDate.php:277
@@ -17338,7 +17338,7 @@ msgstr "%s (geschat)"
 
 #: app/Services/RelationshipService.php:365
 msgid "ex-husband"
-msgstr "ex-echtgenoot"
+msgstr "ex-echt&shy;genoot"
 
 #: app/Services/RelationshipService.php:412
 msgid "ex-spouse"
@@ -17753,7 +17753,7 @@ msgid "full circle"
 msgstr "volledige cirkel"
 
 #: resources/views/modules/statistics-chart/custom.phtml:88
-msgid "gender"
+msgid "sex"
 msgstr "geslacht"
 
 #. I18N: Type of location hierarchy
@@ -19398,7 +19398,7 @@ msgstr "huishouden"
 
 #: app/Elements/RoleInEvent.php:79 app/Services/RelationshipService.php:367
 msgid "husband"
-msgstr "echtgenoot"
+msgstr "echt&shy;genoot"
 
 #. I18N: A name taken on immigration - e.g. migrants to the USA frequently anglicized their names
 #: app/Elements/NameType.php:81
@@ -20509,77 +20509,77 @@ msgstr "huwelijkspartner"
 #: app/Services/RelationshipService.php:831
 msgctxt "father’s wife’s son"
 msgid "step-brother"
-msgstr "stiefbroer"
+msgstr "stief&shy;broer"
 
 #: app/Services/RelationshipService.php:879
 msgctxt "mother’s husband’s son"
 msgid "step-brother"
-msgstr "stiefbroer"
+msgstr "stief&shy;broer"
 
 #: app/Services/RelationshipService.php:957
 msgctxt "parent’s spouse’s son"
 msgid "step-brother"
-msgstr "stiefbroer"
+msgstr "stief&shy;broer"
 
 #: app/Services/RelationshipService.php:547
 msgctxt "husband’s child"
 msgid "step-child"
-msgstr "stiefkind"
+msgstr "stief&shy;kind"
 
 #: app/Services/RelationshipService.php:627
 msgctxt "spouse’s child"
 msgid "step-child"
-msgstr "stiefkind"
+msgstr "stief&shy;kind"
 
 #: app/Services/RelationshipService.php:645
 msgctxt "wife’s child"
 msgid "step-child"
-msgstr "stiefkind"
+msgstr "stief&shy;kind"
 
 #: app/Services/RelationshipService.php:549
 msgctxt "husband’s daughter"
 msgid "step-daughter"
-msgstr "stiefdochter"
+msgstr "stief&shy;dochter"
 
 #: app/Services/RelationshipService.php:629
 msgctxt "spouse’s daughter"
 msgid "step-daughter"
-msgstr "stiefdochter"
+msgstr "stief&shy;dochter"
 
 #: app/Services/RelationshipService.php:647
 msgctxt "wife’s daughter"
 msgid "step-daughter"
-msgstr "stiefdochter"
+msgstr "stief&shy;dochter"
 
 #: app/Services/RelationshipService.php:569
 msgctxt "mother’s husband"
 msgid "step-father"
-msgstr "stiefvader"
+msgstr "stief&shy;vader"
 
 #: app/Services/RelationshipService.php:543
 msgctxt "father’s wife"
 msgid "step-mother"
-msgstr "stiefmoeder"
+msgstr "stief&shy;moeder"
 
 #: app/Services/RelationshipService.php:599
 msgctxt "parent’s spouse"
 msgid "step-parent"
-msgstr "stiefouder"
+msgstr "stief&shy;ouder"
 
 #: app/Services/RelationshipService.php:827
 msgctxt "father’s wife’s child"
 msgid "step-sibling"
-msgstr "stiefbroer/stiefzus"
+msgstr "stiefbroer/&shy;stiefzus"
 
 #: app/Services/RelationshipService.php:875
 msgctxt "mother’s husband’s child"
 msgid "step-sibling"
-msgstr "stiefbroer/stiefzus"
+msgstr "stiefbroer/&shy;stiefzus"
 
 #: app/Services/RelationshipService.php:953
 msgctxt "parent’s spouse’s child"
 msgid "step-sibling"
-msgstr "stiefbroer/stiefzus"
+msgstr "stiefbroer/&shy;stiefzus"
 
 #: app/Services/RelationshipService.php:829
 msgctxt "father’s wife’s daughter"
@@ -21015,7 +21015,7 @@ msgctxt "Unknown surname"
 msgid "…"
 msgstr "…"
 
-#~ msgid " per gender"
+#~ msgid " per sex"
 #~ msgstr " per geslacht"
 
 #~ msgid " per time period"
@@ -22818,7 +22818,7 @@ msgstr "…"
 #~ msgid "This option controls whether or not to automatically expand the <i>Events of close relatives</i> list."
 #~ msgstr "Deze optie bepaalt of de lijst <i>Gebeurtenissen van naaste familie</i> automatisch wordt uitgebreid, of niet."
 
-#~ msgid "This option controls whether or not to show the individual’s gender icon on charts.<br><br>Since the gender is also indicated by the color of the box, this option doesn’t conceal the gender. The option simply removes some duplicate information from the box."
+#~ msgid "This option controls whether or not to show the individual’s sex icon on charts.<br><br>Since the sex is also indicated by the color of the box, this option doesn’t conceal the sex. The option simply removes some duplicate information from the box."
 #~ msgstr "Deze optie bepaalt of u al dan niet het geslachtpictogram op de diagrammen wilt tonen.<br><br>Aangezien het geslacht ook al wordt weergegeven door de kleur van het vak, verbergt deze optie het geslacht dus niet. De optie verwijdert alleen dubbele informatie."
 
 #~ msgid "This option indicates whether the pedigree chart should be generated in landscape or portrait mode."

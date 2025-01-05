@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-19 13:09+0000\n"
-"PO-Revision-Date: 2024-04-07 07:11+0000\n"
+"PO-Revision-Date: 2024-11-29 07:57+0000\n"
 "Last-Translator: HRN65 <hogne@visitusinmaputo.com>\n"
 "Language-Team: Norwegian Bokmål <https://translate.webtrees.net/projects/"
 "webtrees/webtrees/nb_NO/>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: resources/xml/reports/ahnentafel_report.xml:333
 #: resources/xml/reports/ahnentafel_report.xml:358
 msgid " but the details are unknown"
-msgstr " men nærmere detaljer er ikke kjent"
+msgstr " - men nærmere detaljer er ikke kjent"
 
 #: resources/xml/reports/ahnentafel_report.xml:160
 #: resources/xml/reports/ahnentafel_report.xml:188
@@ -214,7 +214,7 @@ msgstr[1] "%s anonyme innloggede brukere"
 msgid "%s child"
 msgid_plural "%s children"
 msgstr[0] "%s barn"
-msgstr[1] "%s barn"
+msgstr[1] "%s barnene"
 
 #: app/Age.php:98 app/Elements/AgeAtEvent.php:103
 #: app/Statistics/Repository/FamilyRepository.php:351
@@ -261,7 +261,7 @@ msgstr[1] "%s slektstrær"
 msgid "%s grandchild"
 msgid_plural "%s grandchildren"
 msgstr[0] "%s barnebarn"
-msgstr[1] "%s barnebarn"
+msgstr[1] "%s barnebarnene"
 
 #: app/Module/LifespansChartModule.php:272
 #: resources/views/admin/trees-unconnected.phtml:42
@@ -392,7 +392,7 @@ msgstr[1] "%s uker"
 msgid "%s year"
 msgid_plural "%s years"
 msgstr[0] "%s år"
-msgstr[1] "%s år"
+msgstr[1] "%s årene"
 
 #: app/Http/RequestHandlers/CalendarEvents.php:157
 #: resources/views/modules/yahrzeit/list.phtml:47
@@ -403,13 +403,13 @@ msgstr "%s årsdag"
 #: app/Services/RelationshipService.php:2354
 #, php-format
 msgid "%s × cousin"
-msgstr "%s menning"
+msgstr "%s kusine"
 
 #: app/Services/RelationshipService.php:2318
 #, php-format
 msgctxt "FEMALE"
 msgid "%s × cousin"
-msgstr "%s menning"
+msgstr "%s slektning"
 
 #. I18N: Note that for Italian and Polish, “N’th cousins” are different from English “N’th cousins”, and the software has already generated the correct “N” for your language. You only need to translate - you do not need to convert. For other languages, if your cousin rules are different from English, please contact the developers.
 #: app/Services/RelationshipService.php:2281
@@ -2591,7 +2591,7 @@ msgstr "Bing Kart™"
 
 #: app/Module/BingWebmasterToolsModule.php:41
 msgid "Bing™ webmaster tools"
-msgstr "Bing™ webmaster tools"
+msgstr "Bing™ verktøy for webansvarlig"
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:65
@@ -5515,7 +5515,7 @@ msgstr "Rediger FAQ-element"
 #: resources/views/individual-page-menu.phtml:73
 #: resources/views/individual-page-sex.phtml:42
 #: resources/views/individual-page-sex.phtml:44
-msgid "Edit the gender"
+msgid "Edit the sex"
 msgstr "Endre kjønn"
 
 #: resources/views/edit/input-addon-edit-name.phtml:14
@@ -13152,7 +13152,7 @@ msgid "Show only females."
 msgstr "Vis kun kvinner."
 
 #: resources/views/lists/individuals-table.phtml:107
-msgid "Show only individuals for whom the gender is not known."
+msgid "Show only individuals for whom the sex is not known."
 msgstr "Vis kun personer hvor kjønn er ukjent."
 
 #: resources/views/modules/random_media/config.phtml:19
@@ -13967,11 +13967,11 @@ msgid "Surnames"
 msgstr "Etternavn"
 
 #: app/SurnameTradition/LithuanianSurnameTradition.php:78
-msgid "Surnames are inflected to indicate an individual’s gender and marital status."
+msgid "Surnames are inflected to indicate an individual’s sex and marital status."
 msgstr "Etternavn bøyes for å angi en persons kjønn og sivilstatus."
 
 #: app/SurnameTradition/PolishSurnameTradition.php:68
-msgid "Surnames are inflected to indicate an individual’s gender."
+msgid "Surnames are inflected to indicate an individual’s sex."
 msgstr "Etternavn bøyes i forhold til personens kjønn."
 
 #. I18N: Location of an LDS church temple
@@ -15936,7 +15936,7 @@ msgstr "Ukjent"
 #: resources/xml/reports/individual_ext_report.xml:606
 #: resources/xml/reports/individual_report.xml:388
 #: resources/xml/reports/individual_report.xml:602
-msgctxt "unknown gender"
+msgctxt "unknown sex"
 msgid "Unknown"
 msgstr "Ukjent"
 
@@ -16075,7 +16075,7 @@ msgstr "Bruk sendmail til å sende meldinger"
 
 #. I18N: Help text for the “Use silhouettes” configuration setting
 #: resources/views/admin/trees-preferences.phtml:311
-msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the gender of the individual in question."
+msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the sex of the individual in question."
 msgstr "Bruk silhuettbilder der hovedbilde for en person ikke er spesifisert. Silhuettbildene som brukes er kjønnsspesifikke."
 
 #. I18N: A configuration setting
@@ -17749,7 +17749,7 @@ msgid "full circle"
 msgstr "hel sirkel"
 
 #: resources/views/modules/statistics-chart/custom.phtml:88
-msgid "gender"
+msgid "sex"
 msgstr "Kjønn"
 
 #. I18N: Type of location hierarchy
@@ -21011,7 +21011,7 @@ msgctxt "Unknown surname"
 msgid "…"
 msgstr "…"
 
-#~ msgid " per gender"
+#~ msgid " per sex"
 #~ msgstr " etter kjønn"
 
 #~ msgid " per time period"
@@ -22810,7 +22810,7 @@ msgstr "…"
 #~ msgid "This option controls whether or not to automatically expand the <i>Events of close relatives</i> list."
 #~ msgstr "Dette alternativet angir om du ønsker at <i>Begivenheter for nære slektninger</i> skal vises automatisk."
 
-#~ msgid "This option controls whether or not to show the individual’s gender icon on charts.<br><br>Since the gender is also indicated by the color of the box, this option doesn’t conceal the gender. The option simply removes some duplicate information from the box."
+#~ msgid "This option controls whether or not to show the individual’s sex icon on charts.<br><br>Since the sex is also indicated by the color of the box, this option doesn’t conceal the sex. The option simply removes some duplicate information from the box."
 #~ msgstr "Dette alternativet kontrollerer om du skal vise en persons kjønn med et ikon på diagrammer eller ikke.<br><br>Siden kjønn også er vist med farge på boksene, vil ikke dette valget skjule en persons kjønn. Valget bare fjerner noe duplisert informasjon fra boksene."
 
 #~ msgid "This option indicates whether the pedigree chart should be generated in landscape or portrait mode."

@@ -3,9 +3,10 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-19 13:09+0000\n"
-"PO-Revision-Date: 2023-09-06 19:12+0000\n"
+"PO-Revision-Date: 2024-10-27 12:42+0000\n"
 "Last-Translator: Gudjon Sigurdsson <gudjon@pm.me>\n"
-"Language-Team: Icelandic <https://translate.webtrees.net/projects/webtrees/webtrees/is/>\n"
+"Language-Team: Icelandic <https://translate.webtrees.net/projects/webtrees/"
+"webtrees/is/>\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -905,7 +906,7 @@ msgstr "Skýrsla yfir einstaklingsupplýsingar."
 
 #: resources/xml/reports/fact_sources.xml:4
 msgid "A report of facts which are supported by a given source."
-msgstr "Skýrsla með staðreyndum sem eru með stuðningi frá tiltekinni heimild."
+msgstr "Skýrsla um staðreyndir sem eru studdar af tiltekinni heimild."
 
 #. I18N: Description of the “Family” module
 #: app/Module/FamilyGroupReportModule.php:56
@@ -951,24 +952,25 @@ msgstr "Skýrsla yfir nýlegar og fyrirhugaðar breytingar."
 #: app/Module/IndividualFamiliesReportModule.php:56
 #: resources/xml/reports/individual_ext_report.xml:4
 msgid "A report of the families that are closely related to an individual."
-msgstr "Skýrsla yfir fjölskyldur sem eru náið tengdar einstaklingi."
+msgstr "Skýrsla um fjölskyldur sem eru náskyldar einstaklingi."
 
 #. I18N: Description of the “Related individuals” module
 #: app/Module/RelatedIndividualsReportModule.php:52
 #: resources/xml/reports/relative_ext_report.xml:4
 msgid "A report of the individuals that are closely related to an individual."
-msgstr "Skýrsla yfir einstaklinga sem eru tengdir náið einstaklingi."
+msgstr "Skýrsla um þá einstaklinga sem eru náskyldir einstaklingi."
 
 #. I18N: Description of the “Source” module
 #: app/Module/FactSourcesReportModule.php:56
 msgid "A report of the information provided by a source."
-msgstr "Skýrsla yfir upplýsingar sem útvegaðar eru af uppruna."
+msgstr "Skýrsla um upplýsingarnar sem veittar voru af heimildarmanni."
 
 #. I18N: Description of the “Missing data”
 #: app/Module/MissingFactsReportModule.php:56
 #: resources/xml/reports/missing_facts_report.xml:4
 msgid "A report of the information that is missing for an individual and their relatives."
-msgstr "Skýrsla yfir upplýsingar sem vantar fyrir einstakling og skyldmenni hans."
+msgstr ""
+"Skýrsla um þær upplýsingar sem vantar fyrir einstakling og aðstandendur hans."
 
 #. I18N: Description of the “Vital records” module. “Vital records” are life events - birth/marriage/death
 #: app/Module/BirthDeathMarriageReportModule.php:52
@@ -1868,7 +1870,7 @@ msgstr "Önnur leið fyrir innskráningu og útskráningu."
 #. I18N: Description of the “HourglassChart” module
 #: app/Module/HourglassChartModule.php:90
 msgid "An hourglass chart of an individual’s ancestors and descendants."
-msgstr "Tímaglasagraf yfir forfeður og afkomendur einstaklings."
+msgstr "Stundaglasagraf yfir forfeður og afkomendur einstaklings."
 
 #: resources/views/edit/reorder-families.phtml:75
 msgid "An individual can have more than one set of parents. For example, birth and adopted."
@@ -1877,7 +1879,7 @@ msgstr "Einstaklingur getur átt fleiri en eina foreldra. Til dæmis, fæðing o
 #. I18N: Description of the “Interactive tree” module
 #: app/Module/InteractiveTreeModule.php:60
 msgid "An interactive tree, showing all the ancestors and descendants of an individual."
-msgstr "Gagnvirkt tré, sem sýnir alla forfeður og afkomendur persónu."
+msgstr "Gagnvirkt tré, sem sýnir alla forfeður og afkomendur einstaklings."
 
 #: resources/views/errors/database-error.phtml:14
 #: resources/views/setup/step-6-failed.phtml:14
@@ -2833,7 +2835,7 @@ msgstr "Fæðing sonar"
 
 #: app/Gedcom.php:603
 msgid "Birth parents"
-msgstr "Fæðingarforeldrar"
+msgstr "Fæðingar foreldrar"
 
 #: resources/views/modules/statistics-chart/places.phtml:18
 msgid "Birth places"
@@ -3266,7 +3268,7 @@ msgstr "Kanada"
 #: app/Http/RequestHandlers/SitePreferencesAction.php:61
 #, php-format
 msgid "Cannot write to the folder “%s”."
-msgstr ""
+msgstr "Get ekki skrifað í möppuna \"%s“."
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:143
@@ -3313,7 +3315,7 @@ msgstr "Ástæða andláts"
 #: resources/views/admin/trees-merge.phtml:66
 #: resources/views/admin/trees-renumber.phtml:47
 msgid "Caution! This may take a long time. Be patient."
-msgstr "Varúð! Þetta getur tekið langan tíma. Vertu þolinmóður."
+msgstr "Varúð! Þetta getur tekið langan tíma. Vertu þolinmóð/-ur."
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:153
@@ -3866,7 +3868,7 @@ msgstr "Tenging við gagnagrunnsþjóninn"
 
 #: resources/views/setup/step-4-database-mysql.phtml:49
 msgid "Connection type"
-msgstr ""
+msgstr "Tegund tengingar"
 
 #. I18N: Name of a module
 #: app/Module/ContactsFooterModule.php:55
@@ -5163,7 +5165,7 @@ msgstr "Áhugi afkomenda"
 
 #: resources/xml/reports/descendancy_report.xml:42
 msgid "Descendants of "
-msgstr "Afkomendur af "
+msgstr "Afkomendur "
 
 #. I18N: %s is an individual’s name
 #: app/Module/DescendancyChartModule.php:138
@@ -5202,7 +5204,9 @@ msgstr "Upplýsingar"
 
 #: resources/views/admin/site-registration.phtml:57
 msgid "Details of the new user will be sent to the genealogy contact for the corresponding family tree."
-msgstr "Upplýsingar um nýja notandann verða sendar á ættartengilið viðkomandi ættartölu."
+msgstr ""
+"Upplýsingar um nýja notandann verða sendar á ættfræði tengilið viðkomandi "
+"ættartölu."
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:90
@@ -5438,7 +5442,18 @@ msgstr "Tvöfalt notandaheiti. Notandi með þetta notandaheiti er þegar til st
 
 #: resources/views/help/source-events.phtml:10
 msgid "Each source records specific events, generally for a given date range and for a place jurisdiction. For example a Census records census events and church records record birth, marriage, and death events.<br><br>Select the events that are recorded by this source from the list of events provided. The date should be specified in a range format such as <i>FROM 1900 TO 1910</i>. The place jurisdiction is the name of the lowest jurisdiction that encompasses all lower-level places named in this source. For example, “Oneida, Idaho, USA” would be used as a source jurisdiction place for events occurring in the various towns within Oneida County. “Idaho, USA” would be the source jurisdiction place if the events recorded took place not only in Oneida County but also in other counties in Idaho."
-msgstr "Hver heimild skráir tiltekna atburði, venjulega fyrir tiltekið tímabil og fyrir lögsögu staða. Til dæmis skráir Manntal manntalsatburði og kirkjubækur skráir fæðingar-, hjónabands- og andlátsatburði. <br> <br> Veldu atburði sem skráðir eru af þessari heimild frá listanum yfir atburði. Dagsetninguna ætti að tilgreina á sviðssniði eins og <i> FRÁ 1900 TIL 1910 </i>. Staðarumdæmi er nafn lægsta staðarumdæmis sem nær til allra lægri staða sem nefndir eru í þessari heimild. Til dæmis, „Oneida, Idaho, Bandaríkjunum“ væri notað sem heimildar staðarumdæmis fyrir atburði sem áttu sér stað í hinum ýmsu bæjum í Oneida-sýslu. „Idaho, USA“ væri heimild staðarumdæmis ef atburðirnir sem skráðir voru áttu sér stað ekki aðeins í Oneida-sýslu heldur einnig í öðrum sýslum í Idaho."
+msgstr ""
+"Hver heimild skráir tiltekna atburði, venjulega fyrir tiltekið tímabil og "
+"fyrir lögsögu staða. Til dæmis skráir Manntal manntalsatburði og kirkjubækur "
+"skráir fæðingar-, hjónabands- og andlátsatburði. <br><br> Veldu atburði sem "
+"skráðir eru af þessari heimild frá listanum yfir atburði. Dagsetninguna ætti "
+"að tilgreina á sviðssniði eins og <i> FRÁ 1900 TIL 1910 </i>. Staðarumdæmi "
+"er nafn lægsta staðarumdæmis sem nær til allra lægri staða sem nefndir eru í "
+"þessari heimild. Til dæmis, „Oneida, Idaho, Bandaríkjunum“ væri notað sem "
+"heimildar staðarumdæmis fyrir atburði sem áttu sér stað í hinum ýmsu bæjum í "
+"Oneida-sýslu. „Idaho, USA“ væri heimild staðarumdæmis ef atburðirnir sem "
+"skráðir voru áttu sér stað ekki aðeins í Oneida-sýslu heldur einnig í öðrum "
+"sýslum í Idaho."
 
 #: resources/views/help/pending-changes.phtml:27
 msgid "Each user account has an option to “automatically accept changes”. When this is enabled, any changes made by that user are saved immediately. Many administrators enable this for their own user account."
@@ -5514,7 +5529,7 @@ msgstr "Breyta spurningum og svörum"
 #: resources/views/individual-page-menu.phtml:73
 #: resources/views/individual-page-sex.phtml:42
 #: resources/views/individual-page-sex.phtml:44
-msgid "Edit the gender"
+msgid "Edit the sex"
 msgstr "Breyta kyni"
 
 #: resources/views/edit/input-addon-edit-name.phtml:14
@@ -6367,7 +6382,7 @@ msgstr "febrúar"
 
 #: app/Elements/SexValue.php:86 app/Module/StatisticsChartModule.php:776
 msgid "Female"
-msgstr "Kvenkyn"
+msgstr "Kona"
 
 #: app/Statistics/Google/ChartAge.php:114
 #: app/Statistics/Google/ChartMarriageAge.php:137
@@ -7263,7 +7278,7 @@ msgstr "Hann var fæddur"
 
 #: resources/xml/reports/ahnentafel_report.xml:338
 msgid "He was buried"
-msgstr "Hann var grafinn"
+msgstr "Hann var jarðsettur"
 
 #: resources/xml/reports/ahnentafel_report.xml:167
 msgid "He was christened"
@@ -7627,7 +7642,11 @@ msgstr "Ef smámyndin er sú sama og upphaflega myndin, þá er þess ekki lengu
 #. I18N: Help text for the “Age at which to assume an individual is dead” configuration setting
 #: resources/views/admin/trees-privacy.phtml:76
 msgid "If this individual has any events other than death, burial, or cremation more recent than this number of years, they are considered to be “alive”. Children’s birth dates are considered to be such events for this purpose."
-msgstr "Ef þessi einstaklingur hefur einhverja atburði aðra en andlát, jarðsetningu eða líkbrennslu sem eru nýlegri en þessi fjöldi ára, þá er hann talinn vera „lifandi“. Fæðingardagar barna eru taldir vera slíkir atburðir í þessum tilgangi."
+msgstr ""
+"Ef þessi einstaklingur hefur einhverja atburði aðra en andlát, jarðsetningu "
+"eða líkbrennslu sem eru nýlegri en þessi fjöldi ára, þá er hann talinn vera "
+"\"á lífi“. Fæðingardagar barna eru taldir vera slíkir atburðir í þessum "
+"tilgangi."
 
 #. I18N: Help text for the “Media folder” configuration setting
 #: resources/views/admin/trees-preferences.phtml:254
@@ -7737,11 +7756,31 @@ msgstr "Í ættartölu hefur hver skrá innri tilvísunarnúmer (kallað „XREF
 
 #: resources/views/help/romanized.phtml:10
 msgid "In many cultures it is customary to have a traditional name spelled in the traditional characters and also a romanized version of the name as it would be spelled or pronounced in languages based on the Latin alphabet, such as English.<br><br>If you prefer to use a non-Latin alphabet such as Hebrew, Greek, Russian, Chinese, or Arabic to enter the name in the standard name fields, then you can use this field to enter the same name using the Latin alphabet. Both versions of the name will appear in lists and charts.<br><br>Although this field is labeled “Romanized”, it is not restricted to containing only characters based on the Latin alphabet. This might be of use with Japanese names, where three different alphabets may occur."
-msgstr "Í mörgum menningarheimum er venja að hafa hefðbundið nafn stafsett með hefðbundnum stöfum og einnig romaniseraða útgáfu af nafninu eins og það væri stafsett eða borið fram á tungumálum byggt á latneska stafrófinu, svo sem ensku. <br> <br> Ef þú vilt frekar nota stafróf sem ekki er latneskt, svo sem hebreska, gríska, rússneska, kínverska eða arabíska til að slá inn nafnið í reitina fyrir venjulegt heiti, þá geturðu notað þennan reit til að slá inn sama nafn með latneska stafrófinu. Báðar útgáfur nafnsins birtast í listum og töflum. <br> <br> Þó að þessi reitur sé merktur „Romanized“ er hann ekki takmarkaður við að innihalda aðeins stafi sem byggja á latneska stafrófinu. Þetta gæti verið gagnlegt með japönskum nöfnum, þar sem þrjú mismunandi stafróf geta komið fyrir."
+msgstr ""
+"Í mörgum menningarheimum er venja að hafa hefðbundið nafn stafsett með "
+"hefðbundnum stöfum og einnig romaniseraða útgáfu af nafninu eins og það væri "
+"stafsett eða borið fram á tungumálum byggt á latneska stafrófinu, svo sem "
+"ensku. <br><br> Ef þú vilt frekar nota stafróf sem ekki er latneskt, svo sem "
+"hebreska, gríska, rússneska, kínverska eða arabíska til að slá inn nafnið í "
+"reitina fyrir venjulegt heiti, þá geturðu notað þennan reit til að slá inn "
+"sama nafn með latneska stafrófinu. Báðar útgáfur nafnsins birtast í listum "
+"og töflum. <br><br> Þó að þessi reitur sé merktur „Romanized“ er hann ekki "
+"takmarkaður við að innihalda aðeins stafi sem byggja á latneska stafrófinu. "
+"Þetta gæti verið gagnlegt með japönskum nöfnum, þar sem þrjú mismunandi "
+"stafróf geta komið fyrir."
 
 #: resources/views/help/hebrew.phtml:10
 msgid "In many cultures it is customary to have a traditional name spelled in the traditional characters and also a romanized version of the name as it would be spelled or pronounced in languages based on the Latin alphabet, such as English.<br><br>If you prefer to use the Latin alphabet to enter the name in the standard name fields, then you can use this field to enter the same name in the non-Latin alphabet such as Greek, Hebrew, Russian, Arabic, or Chinese. Both versions of the name will appear in lists and charts.<br><br>Although this field is labeled “Hebrew”, it is not restricted to containing only Hebrew characters."
-msgstr "Í mörgum menningarheimum er venja að hafa hefðbundið nafn stafsett með hefðbundnum stöfum og einnig romaniseraða útgáfu af nafninu eins og það væri stafsett eða borið fram á tungumálum byggt á latneska stafrófinu, svo sem ensku. <br> <br> Ef þú vilt frekar nota latneska stafrófið til að slá inn nafnið í reitina fyrir venjulegt heiti, þá getur þú notað þennan reit til að slá inn sama nafn í stafrófinu sem ekki er latneskt, svo sem gríska, hebreska, rússneska, arabíska eða kínverska. Báðar útgáfur nafnsins birtast í listum og töflum. <br> <br> Þó að þessi reitur sé merktur „hebreskur“ er hann ekki takmarkaður við að innihalda aðeins hebreska stafi."
+msgstr ""
+"Í mörgum menningarheimum er venja að hafa hefðbundið nafn stafsett með "
+"hefðbundnum stöfum og einnig romaniseraða útgáfu af nafninu eins og það væri "
+"stafsett eða borið fram á tungumálum byggt á latneska stafrófinu, svo sem "
+"ensku. <br><br> Ef þú vilt frekar nota latneska stafrófið til að slá inn "
+"nafnið í reitina fyrir venjulegt heiti, þá getur þú notað þennan reit til að "
+"slá inn sama nafn í stafrófinu sem ekki er latneskt, svo sem gríska, "
+"hebreska, rússneska, arabíska eða kínverska. Báðar útgáfur nafnsins birtast "
+"í listum og töflum. <br><br> Þó að þessi reitur sé merktur „hebreskur“ er "
+"hann ekki takmarkaður við að innihalda aðeins hebreska stafi."
 
 #. I18N: Help text for the “Calendar conversion” configuration setting
 #: resources/views/admin/trees-preferences.phtml:132
@@ -8890,7 +8929,7 @@ msgstr "Maldíveyjar"
 
 #: app/Elements/SexValue.php:85 app/Module/StatisticsChartModule.php:775
 msgid "Male"
-msgstr "Karlkyn"
+msgstr "Karl"
 
 #: app/Statistics/Google/ChartAge.php:113
 #: app/Statistics/Google/ChartMarriageAge.php:136
@@ -10775,7 +10814,7 @@ msgstr "Ææ! Vefþjónninn getur ekki tengst gagnagrunnsþjóninum. Hann kann a
 
 #: app/Http/RequestHandlers/SetupWizard.php:173
 msgid "Oops! webtrees was unable to create files in this folder."
-msgstr "Því miður webtrees gat ekki stofnað skrár í þessari möppu."
+msgstr "Því miður! webtrees gat ekki stofnað skrár í þessari möppu."
 
 #. I18N: https://openrouteservice.org
 #: app/Module/MapGeoLocationOpenRouteService.php:45
@@ -11860,7 +11899,7 @@ msgstr "Færslu auðkennsinúmer"
 
 #: app/Gedcom.php:737 app/Gedcom.php:872
 msgid "Record file number"
-msgstr "Færslu skráarnúmer"
+msgstr "Skrá skráarnúmer"
 
 #: resources/views/modules/fix-search-and-replace/options.phtml:62
 #: resources/views/modules/statistics-chart/other-records.phtml:10
@@ -12960,7 +12999,7 @@ msgstr "Hún var fædd"
 
 #: resources/xml/reports/ahnentafel_report.xml:339
 msgid "She was buried"
-msgstr "Hún var grafin"
+msgstr "Hún var jarðsett"
 
 #: resources/xml/reports/ahnentafel_report.xml:168
 msgid "She was christened"
@@ -13151,7 +13190,7 @@ msgid "Show only females."
 msgstr "Sýna aðeins kvenmenn."
 
 #: resources/views/lists/individuals-table.phtml:107
-msgid "Show only individuals for whom the gender is not known."
+msgid "Show only individuals for whom the sex is not known."
 msgstr "Sýna aðeins einstaklinga þar sem kyn er óþekkt."
 
 #: resources/views/modules/random_media/config.phtml:19
@@ -13520,7 +13559,11 @@ msgstr "Sómalía"
 #. I18N: Help text for the “GEDCOM media path” configuration setting. A “path” is something like “C:\Documents\Genealogy\Photos\John_Smith.jpeg”
 #: resources/views/admin/trees-import.phtml:128
 msgid "Some genealogy software creates GEDCOM files that contain media filenames with full paths. These paths will not exist on the web-server. To allow webtrees to find the file, the first part of the path must be removed."
-msgstr "Sum ættfræðiforrit útbúa GEDCOM skrár sem innihalda skráarheiti gagna með fullum slóðum. Þessar slóðir verða ekki til staðar á vefþjóninum. Til að leyfa Webtrees forritinu að finna skrána verður að fjarlægja fyrsta hluta slóðarinnar."
+msgstr ""
+"Sum ættfræðiforrit útbúa GEDCOM skrár sem innihalda skráarheiti gagna með "
+"fullum slóðum. Þessar slóðir verða ekki til staðar á vefþjóninum. Til að "
+"gera webtrees kleift að finna skrána verður að fjarlægja fyrsta hluta "
+"slóðarinnar."
 
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixNameTags.php:93
@@ -13785,7 +13828,7 @@ msgstr "Statcounter™"
 #: app/Gedcom.php:409 app/Gedcom.php:522 app/Gedcom.php:542 app/Gedcom.php:813
 #: app/Gedcom.php:860
 msgid "State"
-msgstr "Landsvæði"
+msgstr "Landshluti"
 
 #. I18N: Name of a module
 #. I18N: Name of a module/chart
@@ -13956,7 +13999,7 @@ msgstr "Forskeyti eftirnafns"
 
 #: resources/views/admin/trees-preferences.phtml:694
 msgid "Surname tradition"
-msgstr "Eftirnafnavenja"
+msgstr "Eftirnafna venja"
 
 #: resources/views/lists/surnames-table.phtml:30
 #: resources/views/modules/gedcom_stats/config.phtml:70
@@ -13966,11 +14009,11 @@ msgid "Surnames"
 msgstr "Eftirnöfn"
 
 #: app/SurnameTradition/LithuanianSurnameTradition.php:78
-msgid "Surnames are inflected to indicate an individual’s gender and marital status."
+msgid "Surnames are inflected to indicate an individual’s sex and marital status."
 msgstr "Eftirnöfn eru beygð til að gefa til kynna kyn og hjúskaparstöðu."
 
 #: app/SurnameTradition/PolishSurnameTradition.php:68
-msgid "Surnames are inflected to indicate an individual’s gender."
+msgid "Surnames are inflected to indicate an individual’s sex."
 msgstr "Eftirnöfn eru beygð til að gefa til kynna kyn einstaklings."
 
 #. I18N: Location of an LDS church temple
@@ -14534,7 +14577,7 @@ msgstr "Færibreytuna “%s” vantar."
 #: app/Http/RequestHandlers/AdminMediaFileDownload.php:66
 #: app/Http/RequestHandlers/AdminMediaFileThumbnail.php:66
 msgid "The parameter “path” is invalid."
-msgstr ""
+msgstr "Færibreytan \"slóð“ er ógild."
 
 #: app/Http/RequestHandlers/SetupWizard.php:379
 msgid "The password needs to be at least six characters long."
@@ -14732,7 +14775,10 @@ msgstr "Stillingar vefsíðunnar hafa verið uppfærðar."
 #: resources/views/errors/database-error.phtml:22
 #: resources/views/setup/step-6-failed.phtml:22
 msgid "The webtrees developers would be very interested to learn about this error. If you contact them, they will help you resolve the problem."
-msgstr "Þróunaraðilar webtrees eru mjög áhugasamir um að fá upplýsingar um þessa villu. Ef þú hefur samband við þá, þá munu þeir hjálpa þér við að leysa þetta vandamál."
+msgstr ""
+"Þróunaraðilar webtrees eru mjög áhugasamir um að fá upplýsingar um þessa "
+"villu. Ef þú hefur samband þróunaraðilana, þá munu þeir hjálpa þér við að "
+"leysa þetta vandamál."
 
 #: app/Module/ModuleThemeTrait.php:74 app/Module/ModuleThemeTrait.php:471
 #: resources/views/admin/modules.phtml:272
@@ -14760,7 +14806,7 @@ msgstr "Það eru engar staðreyndir fyrir þennan einstakling."
 #: app/Module/IndividualListModule.php:224
 #, php-format
 msgid "There are no individuals with the surname “%s”"
-msgstr ""
+msgstr "Það eru engir einstaklingar með eftirnafnið \"%s“"
 
 #: app/Http/RequestHandlers/ManageMediaData.php:327
 msgid "There are no links to this media object."
@@ -15145,7 +15191,7 @@ msgstr "Þessi síða gerir þér kleift að fara fram hjá venjulegu eyðublö�
 
 #: app/Http/Exceptions/HttpGoneException.php:35
 msgid "This page has been deleted."
-msgstr ""
+msgstr "Þessari síðu hefur verið eytt."
 
 #: app/Module/HitCountFooterModule.php:113
 #, php-format
@@ -15935,7 +15981,7 @@ msgstr "Óþekktur"
 #: resources/xml/reports/individual_ext_report.xml:606
 #: resources/xml/reports/individual_report.xml:388
 #: resources/xml/reports/individual_report.xml:602
-msgctxt "unknown gender"
+msgctxt "unknown sex"
 msgid "Unknown"
 msgstr "Óþekkt"
 
@@ -16074,8 +16120,11 @@ msgstr "Notaðu sendmail til að senda skilaboð"
 
 #. I18N: Help text for the “Use silhouettes” configuration setting
 #: resources/views/admin/trees-preferences.phtml:311
-msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the gender of the individual in question."
-msgstr "Notaðu skuggamyndir þegar engin auðkennd mynd fyrir þennan einstakling hefur verið tilgreind. Myndirnar sem notaðar eru eru sértækar fyrir kyn viðkomandi einstaklings."
+msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the sex of the individual in question."
+msgstr ""
+"Notaðu skuggamyndir þegar engin auðkennd mynd fyrir þennan einstakling hefur "
+"verið tilgreind. Myndirnar sem notaðar eru sértækar fyrir kyn viðkomandi "
+"einstaklings."
 
 #. I18N: A configuration setting
 #: resources/views/admin/trees-preferences.phtml:306
@@ -17169,7 +17218,7 @@ msgstr "halda áfram"
 #: app/Elements/GeneatiqueAct.php:40
 msgctxt "NOUN"
 msgid "copy"
-msgstr ""
+msgstr "afrita"
 
 #. I18N: A button label.
 #: resources/views/admin/trees-create.phtml:57
@@ -17351,7 +17400,7 @@ msgstr "flytja út skrá"
 #: app/Elements/GeneatiqueAct.php:42
 msgctxt "NOUN"
 msgid "extract"
-msgstr ""
+msgstr "útdráttur"
 
 #: app/Http/RequestHandlers/TreePreferencesPage.php:113
 #: resources/xml/reports/fact_sources.xml:6
@@ -17450,7 +17499,7 @@ msgstr "fyrsta"
 #: resources/views/admin/trees-preferences.phtml:570
 msgctxt "Show the [first/last] [N] parts of a place name."
 msgid "first"
-msgstr "fyrsta"
+msgstr "fyrstu"
 
 #. I18N: A Spanish relationship name, such as third great-nephew
 #: app/Services/RelationshipService.php:2421
@@ -17748,7 +17797,7 @@ msgid "full circle"
 msgstr "heill hringur"
 
 #: resources/views/modules/statistics-chart/custom.phtml:88
-msgid "gender"
+msgid "sex"
 msgstr "kyn"
 
 #. I18N: Type of location hierarchy
@@ -18334,22 +18383,22 @@ msgstr "frændi í sjöunda ættlið"
 #: app/Services/RelationshipService.php:1097
 msgctxt "father’s father’s brother’s wife"
 msgid "great-aunt"
-msgstr "maki afabróðurs"
+msgstr "maki bróðurs föðurafa"
 
 #: app/Services/RelationshipService.php:793
 msgctxt "father’s father’s sister"
 msgid "great-aunt"
-msgstr "afasystir"
+msgstr "systir föðurafa"
 
 #: app/Services/RelationshipService.php:1103
 msgctxt "father’s mother’s brother’s wife"
 msgid "great-aunt"
-msgstr "maki ömmubróðurs"
+msgstr "maki bróðurs föðurömmu"
 
 #: app/Services/RelationshipService.php:805
 msgctxt "father’s mother’s sister"
 msgid "great-aunt"
-msgstr "systir móðurafa"
+msgstr "systir föðurömmu"
 
 #: app/Services/RelationshipService.php:1109
 msgctxt "father’s parent’s brother’s wife"
@@ -18364,17 +18413,17 @@ msgstr "systir föðurforeldra"
 #: app/Services/RelationshipService.php:1115
 msgctxt "mother’s father’s brother’s wife"
 msgid "great-aunt"
-msgstr "maki afabróðurs"
+msgstr "maki bróðurs móðurafa"
 
 #: app/Services/RelationshipService.php:873
 msgctxt "mother’s father’s sister"
 msgid "great-aunt"
-msgstr "systir föðurafa"
+msgstr "systir móðurafa"
 
 #: app/Services/RelationshipService.php:1121
 msgctxt "mother’s mother’s brother’s wife"
 msgid "great-aunt"
-msgstr "maki ömmubróðurs"
+msgstr "maki bróðurs móðurömmu"
 
 #: app/Services/RelationshipService.php:891
 msgctxt "mother’s mother’s sister"
@@ -18394,122 +18443,122 @@ msgstr "systir móðurforeldra"
 #: app/Services/RelationshipService.php:1133
 msgctxt "parent’s father’s brother’s wife"
 msgid "great-aunt"
-msgstr "maki afabróðurs"
+msgstr "maki bróðurs föðurforeldra"
 
 #: app/Services/RelationshipService.php:925
 msgctxt "parent’s father’s sister"
 msgid "great-aunt"
-msgstr "afa-/ömmusystir"
+msgstr "systir föðurforeldra"
 
 #: app/Services/RelationshipService.php:1139
 msgctxt "parent’s mother’s brother’s wife"
 msgid "great-aunt"
-msgstr "maki afa-/ömmubróðurs"
+msgstr "maki bróðurs móðurforeldra"
 
 #: app/Services/RelationshipService.php:937
 msgctxt "parent’s mother’s sister"
 msgid "great-aunt"
-msgstr "ömmusystir"
+msgstr "systir móðurforeldra"
 
 #: app/Services/RelationshipService.php:1145
 msgctxt "parent’s parent’s brother’s wife"
 msgid "great-aunt"
-msgstr "maki afa/-ömmubróðurs"
+msgstr "maki bróðurs móður/-föðurforeldra"
 
 #: app/Services/RelationshipService.php:949
 msgctxt "parent’s parent’s sister"
 msgid "great-aunt"
-msgstr "afa-/ömmusystir"
+msgstr "systir móður/-föðurforeldra"
 
 #: app/Services/RelationshipService.php:791
 msgctxt "father’s father’s sibling"
 msgid "great-aunt/uncle"
-msgstr "afasystkini"
+msgstr "systkini föðurafa"
 
 #: app/Services/RelationshipService.php:1099
 msgctxt "father’s father’s sibling’s spouse"
 msgid "great-aunt/uncle"
-msgstr "maki afasystkina"
+msgstr "maki systkinis móður/-föðurforeldra"
 
 #: app/Services/RelationshipService.php:803
 msgctxt "father’s mother’s sibling"
 msgid "great-aunt/uncle"
-msgstr "ömmusystkini"
+msgstr "systkini föðurömmu"
 
 #: app/Services/RelationshipService.php:1105
 msgctxt "father’s mother’s sibling’s spouse"
 msgid "great-aunt/uncle"
-msgstr "maki ömmusystkina"
+msgstr "maki systkinis föðurömmu"
 
 #: app/Services/RelationshipService.php:815
 msgctxt "father’s parent’s sibling"
 msgid "great-aunt/uncle"
-msgstr "afa-/ömmusystkini"
+msgstr "systkini föðurforeldra"
 
 #: app/Services/RelationshipService.php:1111
 msgctxt "father’s parent’s sibling’s spouse"
 msgid "great-aunt/uncle"
-msgstr "maki afa-/ömmusystkina"
+msgstr "maki systkinis föðurforeldra"
 
 #: app/Services/RelationshipService.php:871
 msgctxt "mother’s father’s sibling"
 msgid "great-aunt/uncle"
-msgstr "afasystkini"
+msgstr "systkini móðurafa"
 
 #: app/Services/RelationshipService.php:1117
 msgctxt "mother’s father’s sibling’s spouse"
 msgid "great-aunt/uncle"
-msgstr "maki afasystkina"
+msgstr "maki systkinis móðurafa"
 
 #: app/Services/RelationshipService.php:889
 msgctxt "mother’s mother’s sibling"
 msgid "great-aunt/uncle"
-msgstr "ömmusystkini"
+msgstr "systkini móðurömmu"
 
 #: app/Services/RelationshipService.php:1123
 msgctxt "mother’s mother’s sibling’s spouse"
 msgid "great-aunt/uncle"
-msgstr "maki ömmusystkina"
+msgstr "maki systkinis móðurömmu"
 
 #: app/Services/RelationshipService.php:901
 msgctxt "mother’s parent’s sibling"
 msgid "great-aunt/uncle"
-msgstr "afa-/ömmusystkini"
+msgstr "systkini móðurforeldra"
 
 #: app/Services/RelationshipService.php:1129
 msgctxt "mother’s parent’s sibling’s spouse"
 msgid "great-aunt/uncle"
-msgstr "maki afa-/ömmusystkina"
+msgstr "maki systkinis móðurforeldra"
 
 #: app/Services/RelationshipService.php:923
 msgctxt "parent’s father’s sibling"
 msgid "great-aunt/uncle"
-msgstr "afa-/ömmusystkini"
+msgstr "systkini foreldraafa"
 
 #: app/Services/RelationshipService.php:1135
 msgctxt "parent’s father’s sibling’s spouse"
 msgid "great-aunt/uncle"
-msgstr "maki afa-/ömmusystkina"
+msgstr "maki systkinis foreldraafa"
 
 #: app/Services/RelationshipService.php:935
 msgctxt "parent’s mother’s sibling"
 msgid "great-aunt/uncle"
-msgstr "afa-/ömmusystkini"
+msgstr "systkini foreldraömmu"
 
 #: app/Services/RelationshipService.php:1141
 msgctxt "parent’s mother’s sibling’s spouse"
 msgid "great-aunt/uncle"
-msgstr "maki afa-/ömmusystkina"
+msgstr "maki systkinis foreldraömmu"
 
 #: app/Services/RelationshipService.php:947
 msgctxt "parent’s parent’s sibling"
 msgid "great-aunt/uncle"
-msgstr "afa-/ömmusystkini"
+msgstr "systkini foreldraföður/-móður"
 
 #: app/Services/RelationshipService.php:1147
 msgctxt "parent’s parent’s sibling’s spouse"
 msgid "great-aunt/uncle"
-msgstr "maki afa-/ömmusystkina"
+msgstr "maki systkinis foreldraföður/-móður"
 
 #: app/Services/RelationshipService.php:725
 msgctxt "child’s child’s child"
@@ -19479,7 +19528,7 @@ msgstr "lista"
 #: app/Elements/GeneatiqueAct.php:39
 #: resources/views/setup/step-4-database-mysql.phtml:58
 msgid "local"
-msgstr ""
+msgstr "staðbundið"
 
 #: app/Http/RequestHandlers/MapDataImportAction.php:193
 #, php-format
@@ -19688,7 +19737,7 @@ msgstr "maki systurbarns"
 
 #: resources/views/setup/step-4-database-mysql.phtml:73
 msgid "network"
-msgstr ""
+msgstr "net"
 
 #. I18N: A button label, next page
 #: resources/views/admin/data-fix-select.phtml:50
@@ -19853,7 +19902,7 @@ msgstr "af"
 
 #: app/Elements/GeneatiqueAct.php:38
 msgid "online"
-msgstr ""
+msgstr "á netinu"
 
 #: app/Services/RelationshipService.php:353
 msgid "parent"
@@ -19909,7 +19958,7 @@ msgstr "prósenta"
 
 #: app/Elements/GeneatiqueAct.php:41
 msgid "photocopy"
-msgstr ""
+msgstr "ljósrit"
 
 #. I18N: https://en.wikipedia.org/wiki/Plain_text
 #: app/Http/RequestHandlers/TreePreferencesPage.php:106
@@ -21010,7 +21059,7 @@ msgctxt "Unknown surname"
 msgid "…"
 msgstr "…"
 
-#~ msgid " per gender"
+#~ msgid " per sex"
 #~ msgstr " á kyn"
 
 #~ msgid " per time period"
@@ -22490,7 +22539,7 @@ msgstr "…"
 #~ msgid "This option controls whether or not to automatically expand the <i>Events of close relatives</i> list."
 #~ msgstr "Þessi valkostur stjórnar því hvort útlista eigi sjálfvirkt eða ekki lista yfir <i>Atburði hjá nánum ættingjum</i>."
 
-#~ msgid "This option controls whether or not to show the individual’s gender icon on charts.<br><br>Since the gender is also indicated by the color of the box, this option doesn’t conceal the gender. The option simply removes some duplicate information from the box."
+#~ msgid "This option controls whether or not to show the individual’s sex icon on charts.<br><br>Since the sex is also indicated by the color of the box, this option doesn’t conceal the sex. The option simply removes some duplicate information from the box."
 #~ msgstr "Þessi valkostur stjórnar því hvort birta eigi eða ekki einstaklings kyntákn á grafi.<br><br>Þar sem kynið er einnig gefið til kynna með liti á kassanum þá felur þessi valkostur ekki kynið. Valkosturinn einfaldlega fjarlægir sumar tvöföldu upplýsingarnar í kassanum."
 
 #~ msgid "This option indicates whether the pedigree chart should be generated in landscape or portrait mode."

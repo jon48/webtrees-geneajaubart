@@ -3,9 +3,10 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-19 13:09+0000\n"
-"PO-Revision-Date: 2024-03-04 12:16+0000\n"
-"Last-Translator: Greg Roach <greg@subaqua.co.uk>\n"
-"Language-Team: Catalan <https://translate.webtrees.net/projects/webtrees/webtrees/ca/>\n"
+"PO-Revision-Date: 2024-05-03 17:32+0000\n"
+"Last-Translator: BernatBanyuls <bernatbanyuls@gmail.com>\n"
+"Language-Team: Catalan <https://translate.webtrees.net/projects/webtrees/"
+"webtrees/ca/>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -804,7 +805,7 @@ msgstr "Llistat de fonts."
 #. I18N: Description of the “Submitters” module
 #: app/Module/SubmitterListModule.php:76
 msgid "A list of submitters."
-msgstr "Una llista de fornidors de dades."
+msgstr "Una llista de remitents de dades."
 
 #. I18N: Description of “Research tasks” module
 #: app/Module/ResearchTaskModule.php:86
@@ -4092,7 +4093,7 @@ msgstr "Crea una presentació"
 #: app/Elements/XrefSubmitter.php:60
 #: resources/views/modals/create-submitter.phtml:16
 msgid "Create a submitter"
-msgstr "Crea un fornidor de dades"
+msgstr "Crea un remitent de dades"
 
 #: app/Http/RequestHandlers/UpgradeWizardPage.php:119
 msgid "Create a temporary folder…"
@@ -5518,7 +5519,7 @@ msgstr "Edita la PMF"
 #: resources/views/individual-page-menu.phtml:73
 #: resources/views/individual-page-sex.phtml:42
 #: resources/views/individual-page-sex.phtml:44
-msgid "Edit the gender"
+msgid "Edit the sex"
 msgstr "Edita el gènere"
 
 #: resources/views/edit/input-addon-edit-name.phtml:14
@@ -13155,7 +13156,7 @@ msgid "Show only females."
 msgstr "Mostra solament dones."
 
 #: resources/views/lists/individuals-table.phtml:107
-msgid "Show only individuals for whom the gender is not known."
+msgid "Show only individuals for whom the sex is not known."
 msgstr "Mostra solament persones de les que es desconeix el sexe."
 
 #: resources/views/modules/random_media/config.phtml:19
@@ -13879,11 +13880,11 @@ msgstr "Presentat però pendent d’aprovació"
 #: resources/views/modals/submission-fields.phtml:16
 #: resources/views/modules/recent_changes/changes-table.phtml:76
 msgid "Submitter"
-msgstr "Fornidor de dades"
+msgstr "Remitent de dades"
 
 #: resources/views/lists/submitters-table.phtml:69
 msgid "Submitter name"
-msgstr "Nom del fornidor de dades"
+msgstr "Nom del remitent de dades"
 
 #. I18N: Name of a module/list
 #: app/Module/FixSearchAndReplace.php:114 app/Module/SubmitterListModule.php:65
@@ -13894,7 +13895,7 @@ msgstr "Nom del fornidor de dades"
 #: resources/views/lists/submitters-table.phtml:64
 #: resources/views/record-page-links.phtml:96
 msgid "Submitters"
-msgstr "Fornidors de dades"
+msgstr "Remitents de dades"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:431
@@ -13970,11 +13971,11 @@ msgid "Surnames"
 msgstr "Cognoms"
 
 #: app/SurnameTradition/LithuanianSurnameTradition.php:78
-msgid "Surnames are inflected to indicate an individual’s gender and marital status."
+msgid "Surnames are inflected to indicate an individual’s sex and marital status."
 msgstr "Els cognoms es flexionen per indicar el gènere de la persona i llur estat matrimonial."
 
 #: app/SurnameTradition/PolishSurnameTradition.php:68
-msgid "Surnames are inflected to indicate an individual’s gender."
+msgid "Surnames are inflected to indicate an individual’s sex."
 msgstr "Els cognoms es flexionen per indicar el gènere de la persona."
 
 #. I18N: Location of an LDS church temple
@@ -14658,7 +14659,7 @@ msgstr "S'ha creat la presentació"
 
 #: app/Http/RequestHandlers/CreateSubmitterAction.php:80
 msgid "The submitter has been created"
-msgstr "S'ha creat el fornidor de dades"
+msgstr "S'ha creat el remitent de dades"
 
 #: resources/views/help/name.phtml:15
 #, php-format
@@ -15939,7 +15940,7 @@ msgstr "Desconegut"
 #: resources/xml/reports/individual_ext_report.xml:606
 #: resources/xml/reports/individual_report.xml:388
 #: resources/xml/reports/individual_report.xml:602
-msgctxt "unknown gender"
+msgctxt "unknown sex"
 msgid "Unknown"
 msgstr "Desconegut"
 
@@ -16078,7 +16079,7 @@ msgstr "Utilitza «sendmail» per enviar missatges"
 
 #. I18N: Help text for the “Use silhouettes” configuration setting
 #: resources/views/admin/trees-preferences.phtml:311
-msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the gender of the individual in question."
+msgid "Use silhouette images when no highlighted image for that individual has been specified. The images used are specific to the sex of the individual in question."
 msgstr "Utilitza una silueta quan no s'ha especificat cap imatge per a una persona. Les siluetes són específiques per a cada gènere."
 
 #. I18N: A configuration setting
@@ -17173,7 +17174,7 @@ msgstr "continua"
 #: app/Elements/GeneatiqueAct.php:40
 msgctxt "NOUN"
 msgid "copy"
-msgstr ""
+msgstr "còpia"
 
 #. I18N: A button label.
 #: resources/views/admin/trees-create.phtml:57
@@ -17355,7 +17356,7 @@ msgstr "exporta el fitxer"
 #: app/Elements/GeneatiqueAct.php:42
 msgctxt "NOUN"
 msgid "extract"
-msgstr ""
+msgstr "extracte"
 
 #: app/Http/RequestHandlers/TreePreferencesPage.php:113
 #: resources/xml/reports/fact_sources.xml:6
@@ -17752,7 +17753,7 @@ msgid "full circle"
 msgstr "tot el cercle"
 
 #: resources/views/modules/statistics-chart/custom.phtml:88
-msgid "gender"
+msgid "sex"
 msgstr "homes/dones"
 
 #. I18N: Type of location hierarchy
@@ -19857,7 +19858,7 @@ msgstr "de"
 
 #: app/Elements/GeneatiqueAct.php:38
 msgid "online"
-msgstr ""
+msgstr "En línia"
 
 #: app/Services/RelationshipService.php:353
 msgid "parent"
@@ -19913,7 +19914,7 @@ msgstr "percentatge"
 
 #: app/Elements/GeneatiqueAct.php:41
 msgid "photocopy"
-msgstr ""
+msgstr "Fotocòpia"
 
 #. I18N: https://en.wikipedia.org/wiki/Plain_text
 #: app/Http/RequestHandlers/TreePreferencesPage.php:106
@@ -21014,7 +21015,7 @@ msgctxt "Unknown surname"
 msgid "…"
 msgstr "…"
 
-#~ msgid " per gender"
+#~ msgid " per sex"
 #~ msgstr " per sexes"
 
 #~ msgid " per time period"
@@ -22801,7 +22802,7 @@ msgstr "…"
 #~ msgid "This option controls whether or not to automatically expand the <i>Events of close relatives</i> list."
 #~ msgstr "Aquesta opció controla si s’obre automàticament o no la llista d’<i>Esdeveniments de parents directes</i>."
 
-#~ msgid "This option controls whether or not to show the individual’s gender icon on charts.<br><br>Since the gender is also indicated by the color of the box, this option doesn’t conceal the gender. The option simply removes some duplicate information from the box."
+#~ msgid "This option controls whether or not to show the individual’s sex icon on charts.<br><br>Since the sex is also indicated by the color of the box, this option doesn’t conceal the sex. The option simply removes some duplicate information from the box."
 #~ msgstr "Aquesta opció controla si es mostra o no la icona del gènere (sexe) de les persones als gràfics.<br><br>Atès que el gènere també s’indica mitjançant el color de les caixes, aquesta opció no fa que s’amagui la dada, senzillament estalvia informació duplicada a la caixa."
 
 #~ msgid "This option indicates whether the pedigree chart should be generated in landscape or portrait mode."
