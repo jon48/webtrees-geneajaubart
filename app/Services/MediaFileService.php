@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,13 +19,13 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Services;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Exceptions\FileUploadException;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
@@ -44,7 +44,6 @@ use function dirname;
 use function explode;
 use function ini_get;
 use function intdiv;
-use function is_float;
 use function min;
 use function pathinfo;
 use function sha1;
@@ -53,11 +52,9 @@ use function str_contains;
 use function strlen;
 use function strtoupper;
 use function strtr;
-use function substr;
 use function trim;
 
 use const PATHINFO_EXTENSION;
-use const PHP_INT_MAX;
 use const UPLOAD_ERR_OK;
 
 /**
@@ -306,21 +303,22 @@ class MediaFileService
      */
     public function allFilesInDatabase(string $media_folder, bool $subfolders): Collection
     {
+        $path = DB::concat(['setting_value', 'multimedia_file_refn']);
+
         $query = DB::table('media_file')
             ->join('gedcom_setting', 'gedcom_id', '=', 'm_file')
             ->where('setting_name', '=', 'MEDIA_DIRECTORY')
-            //->where('multimedia_file_refn', 'LIKE', '%/%')
             ->where('multimedia_file_refn', 'NOT LIKE', 'http://%')
             ->where('multimedia_file_refn', 'NOT LIKE', 'https://%')
-            ->where(new Expression('setting_value || multimedia_file_refn'), 'LIKE', $media_folder . '%');
+            ->where(new Expression($path), 'LIKE', $media_folder . '%');
 
         if (!$subfolders) {
-            $query->where(new Expression('setting_value || multimedia_file_refn'), 'NOT LIKE', $media_folder . '%/%');
+            $query->where(new Expression($path), 'NOT LIKE', $media_folder . '%/%');
         }
 
         return $query
-            ->orderBy(new Expression('setting_value || multimedia_file_refn'))
-            ->pluck(new Expression('setting_value || multimedia_file_refn AS path'));
+            ->orderBy(new Expression($path))
+            ->pluck(new Expression($path . ' AS value'));
     }
 
     /**
@@ -361,10 +359,8 @@ class MediaFileService
             })
             ->where('multimedia_file_refn', 'NOT LIKE', 'http://%')
             ->where('multimedia_file_refn', 'NOT LIKE', 'https://%')
-            ->pluck(new Expression("COALESCE(setting_value, 'media/') || multimedia_file_refn AS path"))
-            ->map(static function (string $path): string {
-                return dirname($path) . '/';
-            });
+            ->pluck(new Expression("COALESCE(setting_value, 'media/') || multimedia_file_refn AS value"))
+            ->map(static fn (string $path): string => dirname($path) . '/');
 
         $media_roots = DB::table('gedcom')
             ->leftJoin('gedcom_setting', static function (JoinClause $join): void {
@@ -373,7 +369,7 @@ class MediaFileService
                     ->where('setting_name', '=', 'MEDIA_DIRECTORY');
             })
             ->where('gedcom.gedcom_id', '>', '0')
-            ->pluck(new Expression("COALESCE(setting_value, 'media/') AS path"))
+            ->pluck(new Expression("COALESCE(setting_value, 'media/') AS value"))
             ->uniqueStrict();
 
         $disk_folders = new Collection($media_roots);

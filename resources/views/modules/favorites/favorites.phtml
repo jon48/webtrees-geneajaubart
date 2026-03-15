@@ -2,15 +2,22 @@
 
 declare(strict_types=1);
 
+use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Support\Collection;
 
 /**
  * @var int                    $block_id
  * @var bool                   $can_edit
- * @var Collection<int,object> $favorites
+ * @var array<int,object{
+ *     favorite_id:string,
+ *     favorite_type:string,
+ *     url:string|null,
+ *     note:string|null,
+ *     title:string|null,
+ *     record:GedcomRecord|null
+ * }> $favorites
  * @var string                 $module_name
  * @var Tree                   $tree
  */
@@ -43,11 +50,11 @@ use Illuminate\Support\Collection;
 <?php endforeach ?>
 
 <?php if ($can_edit) : ?>
-    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-backdrop="static" data-bs-target="#favorite-form-<?= e($block_id) ?>">
+    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#favorite-form-<?= e($block_id) ?>">
         <?= I18N::translate('Add a favorite') ?>
     </button>
 
-    <div class="modal fade" id="favorite-form-<?= e($block_id) ?>" tabindex="-1" role="dialog" aria-labelledby="favorite-form-<?= e($block_id) ?>-label" aria-hidden="true">
+    <div class="modal fade" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true" id="favorite-form-<?= e($block_id) ?>" aria-labelledby="favorite-form-<?= e($block_id) ?>-label">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <form method="post" action="<?= e(route('module', ['module' => $module_name, 'action' => 'AddFavorite', 'tree' => $tree->name()])) ?>">

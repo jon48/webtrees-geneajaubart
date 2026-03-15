@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,24 +22,18 @@ namespace Fisharebest\Webtrees;
 use function str_repeat;
 
 /**
- * Test the site functions
+ * @covers \Fisharebest\Webtrees\Site
  */
 class SiteTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @covers \Fisharebest\Webtrees\Site
-     */
     public function testDefault(): void
     {
         self::assertSame('', Site::getPreference('no-such-setting'));
         self::assertSame('UTC', Site::getPreference('TIMEZONE'));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Site
-     */
     public function testSetAndGetPreference(): void
     {
         Site::setPreference('setting', 'foo');
@@ -47,9 +41,6 @@ class SiteTest extends TestCase
         self::assertSame('foo', Site::getPreference('setting'));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Site
-     */
     public function test2000CharacterLimit(): void
     {
         $too_long = str_repeat('x', 3000);

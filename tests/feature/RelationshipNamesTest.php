@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,8 +32,6 @@ use Fisharebest\Webtrees\Services\RelationshipService;
 use function array_reverse;
 
 /**
- * Test the user functions
- *
  * @covers \Fisharebest\Webtrees\Relationship
  * @covers \Fisharebest\Webtrees\Services\RelationshipService
  * @covers \Fisharebest\Webtrees\Module\LanguageEnglishGreatBritain
@@ -74,8 +72,8 @@ class RelationshipNamesTest extends TestCase
         //
         $tree = $this->createMock(Tree::class);
 
-        $individual_factory = $this->createStub(IndividualFactory::class);
-        $family_factory     = $this->createStub(FamilyFactory::class);
+        $individual_factory = $this->createMock(IndividualFactory::class);
+        $family_factory     = $this->createMock(FamilyFactory::class);
 
         Registry::familyFactory($family_factory);
         Registry::individualFactory($individual_factory);
@@ -378,9 +376,7 @@ class RelationshipNamesTest extends TestCase
     }
 
     /**
-     * @param string                   $expected
      * @param array<Individual|Family> $nodes
-     * @param ModuleLanguageInterface  $language
      */
     private static function assertRelationship(string $expected, array $nodes, ModuleLanguageInterface $language): void
     {
@@ -396,10 +392,7 @@ class RelationshipNamesTest extends TestCase
     /**
      * Test a relationship name in both directions
      *
-     * @param string                   $fwd
-     * @param string                   $rev
      * @param array<Individual|Family> $nodes
-     * @param ModuleLanguageInterface  $language
      */
     private static function assertRelationships(string $fwd, string $rev, array $nodes, ModuleLanguageInterface $language): void
     {

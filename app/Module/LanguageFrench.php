@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,9 +23,6 @@ use Fisharebest\Localization\Locale\LocaleFr;
 use Fisharebest\Localization\Locale\LocaleInterface;
 use Fisharebest\Webtrees\Relationship;
 
-/**
- * Class LanguageFrench.
- */
 class LanguageFrench extends AbstractModule implements ModuleLanguageInterface
 {
     use ModuleLanguageTrait;
@@ -56,9 +53,6 @@ class LanguageFrench extends AbstractModule implements ModuleLanguageInterface
         ],
     ];
 
-    /**
-     * @return LocaleInterface
-     */
     public function locale(): LocaleInterface
     {
         return new LocaleFr();

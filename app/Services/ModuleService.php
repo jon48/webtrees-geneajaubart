@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,6 +22,7 @@ namespace Fisharebest\Webtrees\Services;
 use Closure;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\AhnentafelReportModule;
@@ -29,7 +30,6 @@ use Fisharebest\Webtrees\Module\AlbumModule;
 use Fisharebest\Webtrees\Module\AncestorsChartModule;
 use Fisharebest\Webtrees\Module\AustrianHistoricEvents;
 use Fisharebest\Webtrees\Module\AustrianPresidents;
-use Fisharebest\Webtrees\Module\BingMaps;
 use Fisharebest\Webtrees\Module\BingWebmasterToolsModule;
 use Fisharebest\Webtrees\Module\BirthDeathMarriageReportModule;
 use Fisharebest\Webtrees\Module\BirthReportModule;
@@ -97,6 +97,7 @@ use Fisharebest\Webtrees\Module\InteractiveTreeModule;
 use Fisharebest\Webtrees\Module\LanguageAfrikaans;
 use Fisharebest\Webtrees\Module\LanguageAlbanian;
 use Fisharebest\Webtrees\Module\LanguageArabic;
+use Fisharebest\Webtrees\Module\LanguageArmenian;
 use Fisharebest\Webtrees\Module\LanguageBasque;
 use Fisharebest\Webtrees\Module\LanguageBosnian;
 use Fisharebest\Webtrees\Module\LanguageBulgarian;
@@ -258,7 +259,6 @@ use Fisharebest\Webtrees\Module\YahrzeitModule;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Webtrees;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 use Psr\Http\Server\MiddlewareInterface;
 use Throwable;
@@ -328,7 +328,6 @@ class ModuleService
         'austrian-history'        => AustrianHistoricEvents::class,
         'austrian-presidents'     => AustrianPresidents::class,
         'bdm_report'              => BirthDeathMarriageReportModule::class,
-        'bing-maps'               => BingMaps::class,
         'bing-webmaster-tools'    => BingWebmasterToolsModule::class,
         'birth_report'            => BirthReportModule::class,
         'branches_list'           => BranchesListModule::class,
@@ -417,6 +416,7 @@ class ModuleService
         'language-hi'             => LanguageHindi::class,
         'language-hr'             => LanguageCroatian::class,
         'language-hu'             => LanguageHungarian::class,
+        'language-hy'             => LanguageArmenian::class,
         'language-id'             => LanguageIndonesian::class,
         'language-is'             => LanguageIcelandic::class,
         'language-it'             => LanguageItalian::class,

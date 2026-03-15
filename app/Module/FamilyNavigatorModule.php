@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,6 +21,8 @@ namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Services\RelationshipService;
 
 /**
  * Class FamilyNavigatorModule
@@ -29,11 +31,6 @@ class FamilyNavigatorModule extends AbstractModule implements ModuleSidebarInter
 {
     use ModuleSidebarTrait;
 
-    /**
-     * How should this module be identified in the control panel, etc.?
-     *
-     * @return string
-     */
     public function title(): string
     {
         /* I18N: Name of a module/sidebar */
@@ -80,6 +77,9 @@ class FamilyNavigatorModule extends AbstractModule implements ModuleSidebarInter
      */
     public function getSidebarContent(Individual $individual): string
     {
-        return view('modules/family_nav/sidebar', ['individual' => $individual]);
+        return view('modules/family_nav/sidebar', [
+            'individual' => $individual,
+            'relationship_service' => app()->get(RelationshipService::class),
+        ]);
     }
 }

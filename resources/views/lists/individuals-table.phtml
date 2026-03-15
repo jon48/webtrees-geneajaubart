@@ -31,9 +31,7 @@ $today                = new Date(strtoupper(date('d M Y')));
 
 $module = app(ModuleService::class)
     ->findByComponent(ModuleChartInterface::class, $tree, Auth::user())
-    ->first(static function (ModuleInterface $module) {
-        return $module instanceof RelationshipsChartModule;
-    });
+    ->first(static fn (ModuleInterface $module): bool => $module instanceof RelationshipsChartModule);
 ?>
 
 <!-- MYARTJAUB-START -->
@@ -65,14 +63,14 @@ $("#<?= e($table_id) ?> > .wt-table-individual").dataTable({
         /* Given names  */ { type: "text" },
         /* Surnames     */ { type: "text" },
         /* SOSA number  */ { type: "num", visible: <?= json_encode($sosa, JSON_THROW_ON_ERROR) ?> },
-        /* Birth date   */ { type: "num" },
+        /* Birth date   */ { type: "text" },
         /* Anniversary  */ { type: "num" },
         /* Birthplace   */ { type: "text" },
         //MYARTJAUB-START
         <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* Children     */ { type: "num" },
-        /* Deate date   */ { type: "num" },
+        /* Deate date   */ { type: "text" },
         /* Anniversary  */ { type: "num" },
         /* Age          */ { type: "num" },
         /* Death place  */ { type: "text" },
@@ -195,10 +193,8 @@ $("#<?= e($table_id) ?>")
                 <th><?= /* I18N: Abbreviation for “Sosa-Stradonitz number”. This is an individual’s surname, so may need transliterating into non-latin alphabets. */
                     I18N::translate('Sosa') ?></th>
                 <th><?= I18N::translate('Birth') ?></th>
-                <th>
-                    <span title="<?= I18N::translate('Anniversary') ?>">
-                        <?= view('icons/anniversary') ?>
-                    </span>
+                <th title="<?= I18N::translate('Anniversary') ?>">
+                    <?= view('icons/anniversary') ?>
                 </th>
                 <th><?= I18N::translate('Place') ?></th>
                 <!--  MYARTJAUB-START -->
@@ -206,14 +202,12 @@ $("#<?= e($table_id) ?>")
                 <th><?= $maj_issourced_birth['th'] ?></th>
                 <?php endif; ?>
                 <!--  MYARTJAUB-END -->
-                <th>
-                    <i class="icon-children" title="<?= I18N::translate('Children') ?>"></i>
+                <th title="<?= I18N::translate('Children') ?>">
+                    <?= view('icons/children') ?>
                 </th>
                 <th><?= I18N::translate('Death') ?></th>
-                <th>
-                    <span title="<?= I18N::translate('Anniversary') ?>">
-                        <?= view('icons/anniversary') ?>
-                    </span>
+                <th title="<?= I18N::translate('Anniversary') ?>">
+                    <?= view('icons/anniversary') ?>
                 </th>
                 <th><?= I18N::translate('Age') ?></th>
                 <th><?= I18N::translate('Place') ?></th>

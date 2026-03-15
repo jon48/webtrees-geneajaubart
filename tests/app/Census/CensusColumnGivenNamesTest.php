@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,14 +23,11 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\TestCase;
 
 /**
- * Test harness for the class CensusColumnGivenNames
+ * @covers \Fisharebest\Webtrees\Census\CensusColumnGivenNames
+ * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
  */
 class CensusColumnGivenNamesTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnGivenNames
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testGivenNames(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -43,10 +40,6 @@ class CensusColumnGivenNamesTest extends TestCase
         self::assertSame('Joe', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnGivenNames
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testNoName(): void
     {
         $individual = $this->createMock(Individual::class);

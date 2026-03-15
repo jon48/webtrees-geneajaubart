@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,8 +35,6 @@ use Illuminate\Support\Collection;
 use Nyholm\Psr7\Factory\Psr17Factory;
 
 /**
- * Test UpgradeController class.
- *
  * @covers \Fisharebest\Webtrees\Http\RequestHandlers\UpgradeWizardStep
  */
 class UpgradeWizardStepTest extends TestCase

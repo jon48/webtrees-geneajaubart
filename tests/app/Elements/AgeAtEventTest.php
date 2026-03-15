@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,19 +22,14 @@ namespace Fisharebest\Webtrees\Elements;
 use Fisharebest\Webtrees\Tree;
 
 /**
- * Test harness for the class AgeAtEvent
- *
  * @covers \Fisharebest\Webtrees\Elements\AbstractElement
  * @covers \Fisharebest\Webtrees\Elements\AgeAtEvent
  */
 class AgeAtEventTest extends AbstractElementTestCase
 {
-    /**
-     * Standard tests for all elements.
-     */
-    public static function setupBeforeClass(): void
+    public function setUp(): void
     {
-        parent::setUpBeforeClass();
+        parent::setUp();
 
         self::$element = new AgeAtEvent('label');
     }
@@ -50,7 +45,7 @@ class AgeAtEventTest extends AbstractElementTestCase
 
     public function testValue(): void
     {
-        $tree = $this->createStub(Tree::class);
+        $tree = $this->createMock(Tree::class);
 
         self::assertSame('child', self::$element->value('cHiLd', $tree));
         self::assertSame('infant', self::$element->value('iNfAnT ', $tree));

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -40,23 +40,23 @@ class RedirectRepositoryPhpTest extends TestCase
 
     public function testRedirect(): void
     {
-        $tree = $this->createStub(Tree::class);
+        $tree = $this->createMock(Tree::class);
         $tree
             ->method('name')
             ->willReturn('tree1');
 
-        $tree_service = $this->createStub(TreeService::class);
+        $tree_service = $this->createMock(TreeService::class);
         $tree_service
             ->expects(self::once())
             ->method('all')
             ->willReturn(new Collection(['tree1' => $tree]));
 
-        $repository = $this->createStub(Repository::class);
+        $repository = $this->createMock(Repository::class);
         $repository
             ->method('url')
             ->willReturn('https://www.example.com');
 
-        $repository_factory = $this->createStub(RepositoryFactory::class);
+        $repository_factory = $this->createMock(RepositoryFactory::class);
         $repository_factory
             ->expects(self::once())
             ->method('make')
@@ -67,10 +67,7 @@ class RedirectRepositoryPhpTest extends TestCase
 
         $handler = new RedirectRepositoryPhp($tree_service);
 
-        $request = self::createRequest(
-            RequestMethodInterface::METHOD_GET,
-            ['ged' => 'tree1', 'rid' => 'X123']
-        );
+        $request = self::createRequest(RequestMethodInterface::METHOD_GET, ['ged' => 'tree1', 'rid' => 'X123']);
 
         $response = $handler->handle($request);
 
@@ -80,20 +77,17 @@ class RedirectRepositoryPhpTest extends TestCase
 
     public function testNoSuchRecord(): void
     {
-        $tree = $this->createStub(Tree::class);
+        $tree = $this->createMock(Tree::class);
 
-        $tree_service = $this->createStub(TreeService::class);
+        $tree_service = $this->createMock(TreeService::class);
         $tree_service
             ->expects(self::once())
             ->method('all')
-            ->willReturn(new Collection([$tree]));
+            ->willReturn(new Collection(['tree1' => $tree]));
 
         $handler = new RedirectRepositoryPhp($tree_service);
 
-        $request = self::createRequest(
-            RequestMethodInterface::METHOD_GET,
-            ['ged' => 'tree1', 'rid' => 'X123']
-        );
+        $request = self::createRequest(RequestMethodInterface::METHOD_GET, ['ged' => 'tree1', 'rid' => 'X123']);
 
         $this->expectException(HttpGoneException::class);
 
@@ -102,7 +96,7 @@ class RedirectRepositoryPhpTest extends TestCase
 
     public function testMissingXrefParameter(): void
     {
-        $tree_service = $this->createStub(TreeService::class);
+        $tree_service = $this->createMock(TreeService::class);
 
         $handler = new RedirectRepositoryPhp($tree_service);
 

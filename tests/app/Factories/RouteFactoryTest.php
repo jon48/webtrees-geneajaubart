@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,8 +23,6 @@ use Fisharebest\Webtrees\Http\RequestHandlers\HomePage;
 use Fisharebest\Webtrees\TestCase;
 
 /**
- * Test harness for the class RouteFactory
- *
  * @covers \Fisharebest\Webtrees\Factories\RouteFactory
  */
 class RouteFactoryTest extends TestCase
@@ -37,7 +35,7 @@ class RouteFactoryTest extends TestCase
 
         $url = $route_factory->route(HomePage::class, ['foo' => null, 'bar' => '']);
 
-        static::assertStringNotContainsString('foo=', $url);
-        static::assertStringContainsString('bar=', $url);
+        self::assertStringNotContainsString('foo=', $url);
+        self::assertStringContainsString('bar=', $url);
     }
 }

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -95,7 +95,9 @@ class ReportParserBase
 
         fclose($fp);
 
-        xml_parser_free($this->xml_parser);
+        if (PHP_MAJOR_VERSION < 8) {
+            xml_parser_free($this->xml_parser);
+        }
     }
 
     /**

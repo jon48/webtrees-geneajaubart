@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,33 +22,22 @@ namespace Fisharebest\Webtrees;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 
 /**
- * Test the NoReplyUser class
+ * @covers \Fisharebest\Webtrees\NoReplyUser
  */
 class NoReplyUserTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @covers \Fisharebest\Webtrees\NoReplyUser::id
-     * @covers \Fisharebest\Webtrees\NoReplyUser::email
-     * @covers \Fisharebest\Webtrees\NoReplyUser::realName
-     * @covers \Fisharebest\Webtrees\NoReplyUser::userName
-     */
     public function testConstructor(): void
     {
         $user = new NoReplyUser();
 
-        self::assertInstanceOf(UserInterface::class, $user);
         self::assertSame(0, $user->id());
         self::assertSame('no-reply@localhost', $user->email());
         self::assertSame(Webtrees::NAME, $user->realName());
         self::assertSame('', $user->userName());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\NoReplyUser::getPreference
-     * @covers \Fisharebest\Webtrees\NoReplyUser::setPreference
-     */
     public function testPreferences(): void
     {
         $user = new NoReplyUser();

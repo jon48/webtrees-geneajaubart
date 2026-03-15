@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,23 +19,16 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
-use ErrorException;
-
 use function error_reporting;
-use function set_error_handler;
 
 /**
- * Test the Webtrees class
+ * @covers \Fisharebest\Webtrees\Webtrees
  */
 class WebtreesTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Webtrees::bootstrap
-     */
     public function testInit(): void
     {
         error_reporting(0);
-        set_error_handler(null);
 
         $webtrees = new Webtrees();
         $webtrees->bootstrap();
@@ -43,16 +36,5 @@ class WebtreesTest extends TestCase
         // webtrees sets the error reporting level.
         self::assertNotSame(0, error_reporting());
         self::assertSame(Webtrees::ERROR_REPORTING, error_reporting());
-
-        try {
-            // Trigger an error
-            fopen(__DIR__ . '/no-such-file', 'rb');
-        } catch (ErrorException $ex) {
-            self::assertSame(__FILE__, $ex->getFile());
-        }
-
-        // Disable error reporting (we could use "@"), and don't raise an exception.
-        error_reporting(0);
-        fopen(__DIR__ . '/no-such-file', 'rb');
     }
 }

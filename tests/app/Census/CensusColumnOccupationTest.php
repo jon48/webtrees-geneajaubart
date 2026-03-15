@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,14 +25,11 @@ use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
 
 /**
- * Test harness for the class CensusColumnOccupation
+ * @covers \Fisharebest\Webtrees\Census\CensusColumnOccupation
+ * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
  */
 class CensusColumnOccupationTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnOccupation
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testNoOccupation(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -45,10 +42,6 @@ class CensusColumnOccupationTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnOccupation
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testOccupation(): void
     {
         $fact = $this->createMock(Fact::class);

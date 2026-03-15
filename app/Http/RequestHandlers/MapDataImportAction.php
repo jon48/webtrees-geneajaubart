@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Exception;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Exceptions\FileUploadException;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\Gedcom;
@@ -28,7 +29,6 @@ use Fisharebest\Webtrees\PlaceLocation;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\MapDataService;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -135,7 +135,7 @@ class MapDataImportAction implements RequestHandlerInterface
             }
         } else {
             rewind($fp);
-            while (($row = fgetcsv($fp, 0, MapDataService::CSV_SEPARATOR)) !== false) {
+            while (($row = fgetcsv($fp, 0, MapDataService::CSV_SEPARATOR, '"', '\\')) !== false) {
                 // Skip the header
                 if (!is_numeric($row[0])) {
                     continue;

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees\Services;
 
 use Closure;
 use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
@@ -39,7 +40,6 @@ use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Submission;
 use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
@@ -92,6 +92,9 @@ class SearchService
         $this->whereTrees($query, 'f_file', $trees);
         $this->whereSearch($query, 'f_gedcom', $search);
 
+        // Remove accents when searching using PHP.
+        $search = array_map(static fn (string $x): string => I18N::language()->normalize($x), $search);
+
         return $query
             ->get()
             ->each($this->rowLimiter())
@@ -126,8 +129,7 @@ class SearchService
                     ->where('wife_name.n_type', '<>', '_MARNM');
             });
 
-        $prefix = DB::connection()->getTablePrefix();
-        $field  = new Expression('COALESCE(' . $prefix . "husb_name.n_full, '') || COALESCE(" . $prefix . "wife_name.n_full, '')");
+        $field  = new Expression('COALESCE(' . DB::prefix('husb_name') . ".n_full, '') || COALESCE(" . DB::prefix('wife_name') . ".n_full, '')");
 
         $this->whereTrees($query, 'f_file', $trees);
         $this->whereSearch($query, $field, $search);
@@ -174,6 +176,9 @@ class SearchService
 
         $this->whereTrees($query, 'i_file', $trees);
         $this->whereSearch($query, 'i_gedcom', $search);
+
+        // Remove accents when searching using PHP.
+        $search = array_map(static fn (string $x): string => I18N::language()->normalize($x), $search);
 
         return $query
             ->get()
@@ -489,7 +494,7 @@ class SearchService
 
         // Filter each level of the hierarchy.
         foreach (explode(',', $search, 9) as $level => $string) {
-            $query->where('p' . $level . '.p_place', $this->iLike(), '%' . addcslashes($string, '\\%_') . '%');
+            $query->where('p' . $level . '.p_place', DB::iLike(), '%' . addcslashes($string, '\\%_') . '%');
         }
 
         $row_mapper = static function (object $row) use ($tree): Place {
@@ -498,9 +503,7 @@ class SearchService
             return new Place($place, $tree);
         };
 
-        $filter = static function (): bool {
-            return true;
-        };
+        $filter = static fn (): bool => true;
 
         return $this->paginateQuery($query, $row_mapper, $filter, $offset, $limit);
     }
@@ -667,10 +670,10 @@ class SearchService
                                 $query->where('individual_name.n_givn', '=', $field_value);
                                 break;
                             case 'BEGINS':
-                                $query->where('individual_name.n_givn', $this->iLike(), $field_value . '%');
+                                $query->where('individual_name.n_givn', DB::iLike(), $field_value . '%');
                                 break;
                             case 'CONTAINS':
-                                $query->where('individual_name.n_givn', $this->iLike(), '%' . $field_value . '%');
+                                $query->where('individual_name.n_givn', DB::iLike(), '%' . $field_value . '%');
                                 break;
                             case 'SDX_STD':
                                 $sdx = Soundex::russell($field_value);
@@ -678,7 +681,7 @@ class SearchService
                                     $this->wherePhonetic($query, 'individual_name.n_soundex_givn_std', $sdx);
                                 } else {
                                     // No phonetic content? Use a substring match
-                                    $query->where('individual_name.n_givn', $this->iLike(), '%' . $field_value . '%');
+                                    $query->where('individual_name.n_givn', DB::iLike(), '%' . $field_value . '%');
                                 }
                                 break;
                             case 'SDX': // SDX uses DM by default.
@@ -688,7 +691,7 @@ class SearchService
                                     $this->wherePhonetic($query, 'individual_name.n_soundex_givn_dm', $sdx);
                                 } else {
                                     // No phonetic content? Use a substring match
-                                    $query->where('individual_name.n_givn', $this->iLike(), '%' . $field_value . '%');
+                                    $query->where('individual_name.n_givn', DB::iLike(), '%' . $field_value . '%');
                                 }
                                 break;
                         }
@@ -706,15 +709,15 @@ class SearchService
                             case 'BEGINS':
                                 $query->where(function (Builder $query) use ($field_value): void {
                                     $query
-                                        ->where('individual_name.n_surn', $this->iLike(), $field_value . '%')
-                                        ->orWhere('individual_name.n_surname', $this->iLike(), $field_value . '%');
+                                        ->where('individual_name.n_surn', DB::iLike(), $field_value . '%')
+                                        ->orWhere('individual_name.n_surname', DB::iLike(), $field_value . '%');
                                 });
                                 break;
                             case 'CONTAINS':
                                 $query->where(function (Builder $query) use ($field_value): void {
                                     $query
-                                        ->where('individual_name.n_surn', $this->iLike(), '%' . $field_value . '%')
-                                        ->orWhere('individual_name.n_surname', $this->iLike(), '%' . $field_value . '%');
+                                        ->where('individual_name.n_surn', DB::iLike(), '%' . $field_value . '%')
+                                        ->orWhere('individual_name.n_surname', DB::iLike(), '%' . $field_value . '%');
                                 });
                                 break;
                             case 'SDX_STD':
@@ -725,8 +728,8 @@ class SearchService
                                     // No phonetic content? Use a substring match
                                     $query->where(function (Builder $query) use ($field_value): void {
                                         $query
-                                            ->where('individual_name.n_surn', $this->iLike(), '%' . $field_value . '%')
-                                            ->orWhere('individual_name.n_surname', $this->iLike(), '%' . $field_value . '%');
+                                            ->where('individual_name.n_surn', DB::iLike(), '%' . $field_value . '%')
+                                            ->orWhere('individual_name.n_surname', DB::iLike(), '%' . $field_value . '%');
                                     });
                                 }
                                 break;
@@ -739,8 +742,8 @@ class SearchService
                                     // No phonetic content? Use a substring match
                                     $query->where(function (Builder $query) use ($field_value): void {
                                         $query
-                                            ->where('individual_name.n_surn', $this->iLike(), '%' . $field_value . '%')
-                                            ->orWhere('individual_name.n_surname', $this->iLike(), '%' . $field_value . '%');
+                                            ->where('individual_name.n_surn', DB::iLike(), '%' . $field_value . '%')
+                                            ->orWhere('individual_name.n_surname', DB::iLike(), '%' . $field_value . '%');
                                     });
                                 }
                                 break;
@@ -752,7 +755,7 @@ class SearchService
                     case 'INDI:NAME:_HEB':
                     case 'INDI:NAME:_AKA':
                         $like = "%\n1 NAME%\n2 " . $parts[2] . ' %' . preg_quote($field_value, '/') . '%';
-                        $query->where('individuals.i_gedcom', $this->iLike(), $like);
+                        $query->where('individuals.i_gedcom', DB::iLike(), $like);
                         break;
                 }
             } elseif (str_starts_with($field_name, 'INDI:') && str_ends_with($field_name, ':DATE')) {
@@ -790,10 +793,10 @@ class SearchService
                                 $query->where($table . '.n_givn', '=', $field_value);
                                 break;
                             case 'BEGINS':
-                                $query->where($table . '.n_givn', $this->iLike(), $field_value . '%');
+                                $query->where($table . '.n_givn', DB::iLike(), $field_value . '%');
                                 break;
                             case 'CONTAINS':
-                                $query->where($table . '.n_givn', $this->iLike(), '%' . $field_value . '%');
+                                $query->where($table . '.n_givn', DB::iLike(), '%' . $field_value . '%');
                                 break;
                             case 'SDX_STD':
                                 $sdx = Soundex::russell($field_value);
@@ -801,7 +804,7 @@ class SearchService
                                     $this->wherePhonetic($query, $table . '.n_soundex_givn_std', $sdx);
                                 } else {
                                     // No phonetic content? Use a substring match
-                                    $query->where($table . '.n_givn', $this->iLike(), '%' . $field_value . '%');
+                                    $query->where($table . '.n_givn', DB::iLike(), '%' . $field_value . '%');
                                 }
                                 break;
                             case 'SDX': // SDX uses DM by default.
@@ -811,7 +814,7 @@ class SearchService
                                     $this->wherePhonetic($query, $table . '.n_soundex_givn_dm', $sdx);
                                 } else {
                                     // No phonetic content? Use a substring match
-                                    $query->where($table . '.n_givn', $this->iLike(), '%' . $field_value . '%');
+                                    $query->where($table . '.n_givn', DB::iLike(), '%' . $field_value . '%');
                                 }
                                 break;
                         }
@@ -822,10 +825,10 @@ class SearchService
                                 $query->where($table . '.n_surn', '=', $field_value);
                                 break;
                             case 'BEGINS':
-                                $query->where($table . '.n_surn', $this->iLike(), $field_value . '%');
+                                $query->where($table . '.n_surn', DB::iLike(), $field_value . '%');
                                 break;
                             case 'CONTAINS':
-                                $query->where($table . '.n_surn', $this->iLike(), '%' . $field_value . '%');
+                                $query->where($table . '.n_surn', DB::iLike(), '%' . $field_value . '%');
                                 break;
                             case 'SDX_STD':
                                 $sdx = Soundex::russell($field_value);
@@ -833,7 +836,7 @@ class SearchService
                                     $this->wherePhonetic($query, $table . '.n_soundex_surn_std', $sdx);
                                 } else {
                                     // No phonetic content? Use a substring match
-                                    $query->where($table . '.n_surn', $this->iLike(), '%' . $field_value . '%');
+                                    $query->where($table . '.n_surn', DB::iLike(), '%' . $field_value . '%');
                                 }
                                 break;
                             case 'SDX': // SDX uses DM by default.
@@ -843,7 +846,7 @@ class SearchService
                                     $this->wherePhonetic($query, $table . '.n_soundex_surn_dm', $sdx);
                                 } else {
                                     // No phonetic content? Use a substring match
-                                    $query->where($table . '.n_surn', $this->iLike(), '%' . $field_value . '%');
+                                    $query->where($table . '.n_surn', DB::iLike(), '%' . $field_value . '%');
                                 }
                                 break;
                         }
@@ -853,14 +856,14 @@ class SearchService
             } elseif (str_starts_with($field_name, 'FAM:')) {
                 // e.g. searches for occupation, religion, note, etc.
                 // Initial matching only.  Need PHP to apply filter.
-                $query->where('spouse_families.f_gedcom', $this->iLike(), "%\n1 " . $parts[1] . ' %' . $field_value . '%');
+                $query->where('spouse_families.f_gedcom', DB::iLike(), "%\n1 " . $parts[1] . ' %' . $field_value . '%');
             } elseif (str_starts_with($field_name, 'INDI:') && str_ends_with($field_name, ':TYPE')) {
                 // Initial matching only.  Need PHP to apply filter.
-                $query->where('individuals.i_gedcom', $this->iLike(), "%\n1 " . $parts[1] . "%\n2 TYPE %" . $field_value . '%');
+                $query->where('individuals.i_gedcom', DB::iLike(), "%\n1 " . $parts[1] . "%\n2 TYPE %" . $field_value . '%');
             } elseif (str_starts_with($field_name, 'INDI:')) {
                 // e.g. searches for occupation, religion, note, etc.
                 // Initial matching only.  Need PHP to apply filter.
-                $query->where('individuals.i_gedcom', $this->iLike(), "%\n1 " . $parts[1] . '%' . $parts[2] . '%' . $field_value . '%');
+                $query->where('individuals.i_gedcom', DB::iLike(), "%\n1 " . $parts[1] . '%' . $parts[2] . '%' . $field_value . '%');
             }
         }
 
@@ -1074,7 +1077,7 @@ class SearchService
     private function whereSearch(Builder $query, $column, array $search_terms): void
     {
         foreach ($search_terms as $search_term) {
-            $query->where($column, $this->iLike(), '%' . addcslashes($search_term, '\\%_') . '%');
+            $query->where($column, DB::iLike(), '%' . addcslashes($search_term, '\\%_') . '%');
         }
     }
 
@@ -1090,7 +1093,7 @@ class SearchService
         if ($soundex !== '') {
             $query->where(function (Builder $query) use ($soundex, $field): void {
                 foreach (explode(':', $soundex) as $sdx) {
-                    $query->orWhere($field, $this->iLike(), '%' . $sdx . '%');
+                    $query->orWhere($field, DB::iLike(), '%' . $sdx . '%');
                 }
             });
         }
@@ -1103,9 +1106,7 @@ class SearchService
      */
     private function whereTrees(Builder $query, string $tree_id_field, array $trees): void
     {
-        $tree_ids = array_map(static function (Tree $tree): int {
-            return $tree->id();
-        }, $trees);
+        $tree_ids = array_map(static fn (Tree $tree): int => $tree->id(), $trees);
 
         $query->whereIn($tree_id_field, $tree_ids);
     }
@@ -1126,7 +1127,7 @@ class SearchService
                     ->on('media_file.m_id', '=', 'media.m_id');
             })
             ->join('gedcom_setting', 'media.m_file', '=', 'gedcom_setting.gedcom_id')
-            ->where(new Expression('setting_value || multimedia_file_refn'), '=', $file)
+            ->where(new Expression(DB::concat(['setting_value', 'multimedia_file_refn'])), '=', $file)
             ->select(['media.*'])
             ->distinct()
             ->get()
@@ -1145,10 +1146,19 @@ class SearchService
     {
         return static function (GedcomRecord $record) use ($search_terms): bool {
             // Ignore non-genealogy fields
-            $gedcom = preg_replace('/\n\d (?:_UID|_WT_USER) .*/', '', $record->gedcom());
+            $regex = '/^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9A-F]{36})$/i';
+
+            if (array_filter($search_terms, static fn (string $term): bool => preg_match($regex, $term) === 1) !== []) {
+                $gedcom = preg_replace('/\n\d _WT_USER .*/', '', $record->gedcom());
+            } else {
+                $gedcom = preg_replace('/\n\d (UID|_UID|_WT_USER) .*/', '', $record->gedcom());
+            }
 
             // Ignore matches in links
             $gedcom = preg_replace('/\n\d ' . Gedcom::REGEX_TAG . '( @' . Gedcom::REGEX_XREF . '@)?/', '', $gedcom);
+
+            // Remove accents when searching using PHP.
+            $gedcom = I18N::language()->normalize($gedcom);
 
             // Re-apply the filtering
             foreach ($search_terms as $search_term) {
@@ -1240,7 +1250,7 @@ class SearchService
     /**
      * Convert a row from any tree in the other table into a note object.
      *
-     * @return Closure:Note
+     * @return Closure(object):Note
      */
     private function noteRowMapper(): Closure
     {
@@ -1254,7 +1264,7 @@ class SearchService
     /**
      * Convert a row from any tree in the other table into a repository object.
      *
-     * @return Closure:Repository
+     * @return Closure(object):Repository
      */
     private function repositoryRowMapper(): Closure
     {
@@ -1282,7 +1292,7 @@ class SearchService
     /**
      * Convert a row from any tree in the sources table into a source object.
      *
-     * @return Closure:Source
+     * @return Closure(object):Source
      */
     private function sourceRowMapper(): Closure
     {
@@ -1319,17 +1329,5 @@ class SearchService
 
             return Registry::submitterFactory()->mapper($tree)($row);
         };
-    }
-
-    /**
-     * @internal - a better solution would support other RDBMS, probably by using collations.
-     */
-    private function iLike(): string
-    {
-        if (DB::connection()->getDriverName() === 'pgsql') {
-            return 'ILIKE';
-        }
-
-        return 'LIKE';
     }
 }

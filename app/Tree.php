@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,9 +22,10 @@ namespace Fisharebest\Webtrees;
 use Closure;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Services\PendingChangesService;
-use Illuminate\Database\Capsule\Manager as DB;
 use InvalidArgumentException;
 use League\Flysystem\FilesystemOperator;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 use function app;
 use function array_key_exists;
@@ -354,8 +355,9 @@ class Tree
      *
      * @param string $gedcom
      *
-     * @return GedcomRecord|Individual|Family|Location|Note|Source|Repository|Media|Submitter|Submission
-     * @throws InvalidArgumentException
+     * @return GedcomRecord
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function createRecord(string $gedcom): GedcomRecord
     {

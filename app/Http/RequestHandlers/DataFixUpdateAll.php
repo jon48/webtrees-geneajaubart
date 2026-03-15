@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -102,10 +102,10 @@ class DataFixUpdateAll implements RequestHandlerInterface
     }
 
     /**
-     * @param Tree                   $tree
-     * @param ModuleDataFixInterface $module
-     * @param Collection<int,object> $rows
-     * @param array<string>          $params
+     * @param Tree                                            $tree
+     * @param ModuleDataFixInterface                          $module
+     * @param Collection<int,object{xref:string,type:string}> $rows
+     * @param array<string>                                   $params
      *
      * @return ResponseInterface
      */

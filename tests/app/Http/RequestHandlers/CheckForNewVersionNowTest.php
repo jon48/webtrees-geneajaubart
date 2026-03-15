@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,14 +22,12 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Fisharebest\Webtrees\TestCase;
 
 /**
- * Test harness for the class CheckForNewVersionNow
- *
  * @covers \Fisharebest\Webtrees\Http\RequestHandlers\CheckForNewVersionNow
  */
 class CheckForNewVersionNowTest extends TestCase
 {
     public function testClass(): void
     {
-        $this->assertTrue(class_exists(\Fisharebest\Webtrees\Http\RequestHandlers\CheckForNewVersionNow::class));
+        self::assertTrue(class_exists(CheckForNewVersionNow::class));
     }
 }

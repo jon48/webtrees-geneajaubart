@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Menu;
@@ -27,7 +28,6 @@ use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
@@ -59,11 +59,6 @@ class FrequentlyAskedQuestionsModule extends AbstractModule implements ModuleCon
         $this->tree_service = $tree_service;
     }
 
-    /**
-     * How should this module be identified in the control panel, etc.?
-     *
-     * @return string
-     */
     public function title(): string
     {
         /* I18N: Name of a module. Abbreviation for “Frequently Asked Questions” */
@@ -135,7 +130,7 @@ class FrequentlyAskedQuestionsModule extends AbstractModule implements ModuleCon
             return redirect(route(ControlPanel::class));
         }
 
-        $faqs = $this->faqsForTree($tree);
+        $faqs = $this->faqsForTree($tree)->all();
 
         $min_block_order = (int) DB::table('block')
             ->where('module_name', '=', $this->name())
@@ -390,9 +385,8 @@ class FrequentlyAskedQuestionsModule extends AbstractModule implements ModuleCon
 
         // Filter foreign languages.
         $faqs = $this->faqsForTree($tree)
-            ->filter(static function (object $faq): bool {
-                return $faq->languages === '' || in_array(I18N::languageTag(), explode(',', $faq->languages), true);
-            });
+            ->filter(static fn (object $faq): bool => $faq->languages === '' || in_array(I18N::languageTag(), explode(',', $faq->languages), true))
+            ->all();
 
         return $this->viewResponse('modules/faq/show', [
             'faqs'  => $faqs,
@@ -404,7 +398,14 @@ class FrequentlyAskedQuestionsModule extends AbstractModule implements ModuleCon
     /**
      * @param Tree $tree
      *
-     * @return Collection<int,object>
+     * @return Collection<int,object{
+     *     block_id: int,
+     *     block_order: int,
+     *     gedcom_id: int,
+     *     header: string,
+     *     faqbody: string,
+     *     languages: string
+     * }>
      */
     private function faqsForTree(Tree $tree): Collection
     {

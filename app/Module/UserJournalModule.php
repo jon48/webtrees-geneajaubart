@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +19,11 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
 use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Http\RequestHandlers\UserPage;
@@ -28,26 +32,18 @@ use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\HtmlService;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use function redirect;
 
-/**
- * Class UserJournalModule
- */
 class UserJournalModule extends AbstractModule implements ModuleBlockInterface
 {
     use ModuleBlockTrait;
 
     private HtmlService $html_service;
 
-    /**
-     * @param HtmlService $html_service
-     */
     public function __construct(HtmlService $html_service)
     {
         $this->html_service = $html_service;
@@ -67,12 +63,7 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree                 $tree
-     * @param int                  $block_id
-     * @param string               $context
      * @param array<string,string> $config
-     *
-     * @return string
      */
     public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
@@ -106,54 +97,27 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
         return $content;
     }
 
-    /**
-     * How should this module be identified in the control panel, etc.?
-     *
-     * @return string
-     */
     public function title(): string
     {
         /* I18N: Name of a module */
         return I18N::translate('Journal');
     }
 
-    /**
-     * Should this block load asynchronously using AJAX?
-     *
-     * Simple blocks are faster in-line, more complex ones can be loaded later.
-     *
-     * @return bool
-     */
     public function loadAjax(): bool
     {
         return false;
     }
 
-    /**
-     * Can this block be shown on the user’s home page?
-     *
-     * @return bool
-     */
     public function isUserBlock(): bool
     {
         return true;
     }
 
-    /**
-     * Can this block be shown on the tree’s home page?
-     *
-     * @return bool
-     */
     public function isTreeBlock(): bool
     {
         return false;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
     public function getEditJournalAction(ServerRequestInterface $request): ResponseInterface
     {
         $tree = Validator::attributes($request)->tree();
@@ -163,6 +127,9 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
         }
 
         $news_id = Validator::queryParams($request)->integer('news_id', 0);
+
+        $timezone = new DateTimeZone(Auth::user()->getPreference(UserInterface::PREF_TIME_ZONE, 'UTC'));
+        $utc      = new DateTimeZone('UTC');
 
         if ($news_id !== 0) {
             $row = DB::table('news')
@@ -174,26 +141,27 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
             if ($row === null) {
                 throw new HttpNotFoundException(I18N::translate('%s does not exist.', 'news_id:' . $news_id));
             }
+
+            $body    = $row->body;
+            $subject = $row->subject;
+            $updated = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $row->updated, $utc)
+                ->setTimezone($timezone);
         } else {
-            $row = (object)['body' => '', 'subject' => ''];
+            $body    = '';
+            $subject = '';
+            $updated = Registry::timestampFactory()->now(Auth::user());
         }
 
-        $title = I18N::translate('Add/edit a journal/news entry');
-
         return $this->viewResponse('modules/user_blog/edit', [
-            'body'    => $row->body,
+            'body'    => $body,
             'news_id' => $news_id,
-            'subject' => $row->subject,
-            'title'   => $title,
+            'subject' => $subject,
+            'title'   => $this->title(),
             'tree'    => $tree,
+            'updated' => $updated->format('Y-m-d H:i:s'),
         ]);
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
     public function postEditJournalAction(ServerRequestInterface $request): ResponseInterface
     {
         $tree = Validator::attributes($request)->tree();
@@ -209,20 +177,33 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
         $subject = $this->html_service->sanitize($subject);
         $body    = $this->html_service->sanitize($body);
 
+        $use_current_timestamp = Validator::parsedBody($request)->boolean('use-current-timestamp', false);
+
+        if ($use_current_timestamp) {
+            $updated = Registry::timestampFactory()->now();
+        } else {
+            $timestamp = Validator::parsedBody($request)->string('timestamp');
+            $timezone  = new DateTimeZone(Auth::user()->getPreference(UserInterface::PREF_TIME_ZONE, 'UTC'));
+            $utc       = new DateTimeZone('UTC');
+            $updated   = DateTimeImmutable::createFromFormat('Y-m-d\\TH:i:s', $timestamp, $timezone)
+                ->setTimezone($utc);
+        }
+
         if ($news_id !== 0) {
             DB::table('news')
                 ->where('news_id', '=', $news_id)
-                ->where('user_id', '=', Auth::id())
+                ->where('user_id', '=', Auth::id()) // Check this is our own page - validates news_id
                 ->update([
                     'body'    => $body,
                     'subject' => $subject,
-                    'updated' => new Expression('updated'), // See issue #3208
+                    'updated' => $updated->format('Y-m-d H:i:s'),
                 ]);
         } else {
             DB::table('news')->insert([
                 'body'    => $body,
                 'subject' => $subject,
                 'user_id' => Auth::id(),
+                'updated' => $updated->format('Y-m-d H:i:s'),
             ]);
         }
 
@@ -231,11 +212,6 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
         return redirect($url);
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
     public function postDeleteJournalAction(ServerRequestInterface $request): ResponseInterface
     {
         $tree    = Validator::attributes($request)->tree();

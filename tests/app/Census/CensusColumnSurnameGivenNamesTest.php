@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,14 +24,11 @@ use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
 
 /**
- * Test harness for the class CensusColumnSurnameGivenNames
+ * @covers \Fisharebest\Webtrees\Census\CensusColumnSurnameGivenNames
+ * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
  */
 class CensusColumnSurnameGivenNamesTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnSurnameGivenNames
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testOneGivenName(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -51,10 +48,6 @@ class CensusColumnSurnameGivenNamesTest extends TestCase
         self::assertSame('Sixpack, Joe', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnSurnameGivenNames
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testMultipleGivenNames(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -74,10 +67,6 @@ class CensusColumnSurnameGivenNamesTest extends TestCase
         self::assertSame('Sixpack, Joe Fred', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnSurnameGivenNames
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testNoName(): void
     {
         $individual = $this->createMock(Individual::class);

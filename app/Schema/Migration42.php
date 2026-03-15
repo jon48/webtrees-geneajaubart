@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Schema;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Module\ModuleBlockInterface;
 use Fisharebest\Webtrees\Module\ModuleChartInterface;
 use Fisharebest\Webtrees\Module\ModuleListInterface;
@@ -27,7 +28,6 @@ use Fisharebest\Webtrees\Module\ModuleReportInterface;
 use Fisharebest\Webtrees\Module\ModuleSidebarInterface;
 use Fisharebest\Webtrees\Module\ModuleTabInterface;
 use Fisharebest\Webtrees\Module\ModuleThemeInterface;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
 
 /**
@@ -46,11 +46,6 @@ class Migration42 implements MigrationInterface
         'theme'   => ModuleThemeInterface::class,
     ];
 
-    /**
-     * Upgrade to the next version
-     *
-     * @return void
-     */
     public function upgrade(): void
     {
         // doctrine/dbal cannot modify tables containing ENUM fields
@@ -66,8 +61,8 @@ class Migration42 implements MigrationInterface
             $table->tinyInteger('access_level');
 
             // Default constraint names are too long for MySQL.
-            $key1 = DB::connection()->getTablePrefix() . $table->getTable() . '_ix1';
-            $key2 = DB::connection()->getTablePrefix() . $table->getTable() . '_ix2';
+            $key1 = DB::prefix($table->getTable() . '_ix1');
+            $key2 = DB::prefix($table->getTable() . '_ix2');
 
             $table->unique(['gedcom_id', 'module_name', 'interface'], $key1);
             $table->unique(['module_name', 'gedcom_id', 'interface'], $key2);

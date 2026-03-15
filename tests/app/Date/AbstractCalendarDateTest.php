@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,13 +22,10 @@ namespace Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\TestCase;
 
 /**
- * Test harness for the class AbstractCalendarDate
+ * @covers \Fisharebest\Webtrees\Date\AbstractCalendarDate
  */
 class AbstractCalendarDateTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Date\AbstractCalendarDate::ageDifference
-     */
     public function testAgeDifference(): void
     {
         $date1 = new GregorianDate(['1900', 'FEB', '4']);
@@ -64,9 +61,6 @@ class AbstractCalendarDateTest extends TestCase
         self::assertSame([-31, 11, 27], $date1->ageDifference($date2));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Date\AbstractCalendarDate::ageDifference
-     */
     public function testAgeDifferenceIncomplete(): void
     {
         $date1 = new GregorianDate(['', 'FEB', '4']);
@@ -106,9 +100,6 @@ class AbstractCalendarDateTest extends TestCase
         self::assertSame([0, 0, 28], $date1->ageDifference($date2));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Date\AbstractCalendarDate::ageDifference
-     */
     public function testAgeDifferenceOverlap(): void
     {
         $date1 = new GregorianDate(['1900', 'FEB', '4']);

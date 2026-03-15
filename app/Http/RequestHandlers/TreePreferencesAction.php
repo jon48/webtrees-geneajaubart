@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,10 +20,10 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use PDOException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -127,7 +127,7 @@ class TreePreferencesAction implements RequestHandlerInterface
         $tree->setPreference('SURNAME_LIST_STYLE', $surname_list_style);
         $tree->setPreference('SURNAME_TRADITION', $surname_tradition);
         $tree->setPreference('USE_SILHOUETTE', (string) $use_silhouette);
-        $tree->setPreference('WEBMASTER_USER_ID', (string) $webmaster_user_id);
+        $tree->setPreference('WEBMASTER_USER_ID', $webmaster_user_id);
         $tree->setPreference('title', $title);
 
         $url = route(ManageTrees::class, ['tree' => $tree->name()]);

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -120,15 +120,9 @@ class ModuleActionTest extends TestCase
         $handler->handle($request);
     }
 
-    /**
-     * @return ModuleInterface
-     */
     private function fooModule(): ModuleInterface
     {
         return new class () extends AbstractModule {
-            /**
-             * @return ResponseInterface
-             */
             public function getTestAction(): ResponseInterface
             {
                 return response('It works!');

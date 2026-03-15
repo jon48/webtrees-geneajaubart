@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -134,8 +134,8 @@ class LoginAction implements RequestHandlerInterface
         Log::addAuthenticationLog('Login: ' . Auth::user()->userName() . '/' . Auth::user()->realName());
         Auth::user()->setPreference(UserInterface::PREF_TIMESTAMP_ACTIVE, (string) time());
 
-        Session::put('language', Auth::user()->getPreference(UserInterface::PREF_LANGUAGE));
+        Session::put('language', Auth::user()->getPreference(UserInterface::PREF_LANGUAGE, 'en-US'));
         Session::put('theme', Auth::user()->getPreference(UserInterface::PREF_THEME));
-        I18N::init(Auth::user()->getPreference(UserInterface::PREF_LANGUAGE));
+        I18N::init(Auth::user()->getPreference(UserInterface::PREF_LANGUAGE, 'en-US'));
     }
 }

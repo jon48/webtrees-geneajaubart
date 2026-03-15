@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Timestamp;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 
 /**
- * @var Collection<int,object> $articles
- * @var int                    $block_id
- * @var int                    $limit
- * @var Tree                   $tree
+ * @var Collection<int,object{subject:string,body:string,updated:Timestamp,news_id:string}> $articles
+ * @var int                                                                                 $block_id
+ * @var int                                                                                 $limit
+ * @var Tree                                                                                $tree
  */
 
 ?>
@@ -22,13 +23,13 @@ use Illuminate\Support\Collection;
 
 <?php foreach ($articles as $n => $article) : ?>
     <?php if ($n === $limit && count($articles) > $limit) : ?>
-    <p>
-        <button class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#more-news-<?= e($block_id) ?>" role="button" aria-expanded="false" aria-controls="more-news-<?= e($block_id) ?>">
-            <?= view('icons/add') ?>
-            <?= I18N::translate('show more') ?>
-        </button>
-    </p>
-<div class="collapse" id="more-news-<?= e($block_id) ?>">
+        <p>
+            <button class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#more-news-<?= e($block_id) ?>" role="button" aria-expanded="false" aria-controls="more-news-<?= e($block_id) ?>">
+                <?= view('icons/add') ?>
+                <?= I18N::translate('show more') ?>
+            </button>
+        </p>
+        <div class="collapse" id="more-news-<?= e($block_id) ?>">
     <?php endif ?>
 
     <div class="news_box">
@@ -53,9 +54,9 @@ use Illuminate\Support\Collection;
     </div>
 <?php endforeach ?>
 
-    <?php if (count($articles) > $limit) : ?>
-</div>
-    <?php endif ?>
+<?php if (count($articles) > $limit) : ?>
+    </div>
+<?php endif ?>
 
 <?php if (Auth::isManager($tree)) : ?>
     <p>

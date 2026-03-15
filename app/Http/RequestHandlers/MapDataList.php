@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -117,7 +117,7 @@ class MapDataList implements RequestHandlerInterface
 
         return $this->viewResponse('admin/locations', [
             'active'       => $this->map_data_service->activePlaces($parent),
-            'all_trees'    => $this->tree_service->all(),
+            'all_trees'    => $this->tree_service->all()->all(),
             'breadcrumbs'  => array_reverse($breadcrumbs),
             'parent_id'    => $parent_id,
             'placelist'    => $this->map_data_service->getPlaceListLocation($parent_id),

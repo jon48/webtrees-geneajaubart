@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Media;
@@ -29,7 +30,6 @@ use Fisharebest\Webtrees\Services\LinkedRecordService;
 use Fisharebest\Webtrees\Services\MediaFileService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
@@ -106,7 +106,7 @@ class ManageMediaData implements RequestHandlerInterface
 
         $sort_columns = [
             0 => 'multimedia_file_refn',
-            2 => new Expression('descriptive_title || multimedia_file_refn'),
+            2 => new Expression(DB::concat(['descriptive_title', 'multimedia_file_refn'])),
         ];
 
         // Convert a row from the database into a row for datatables
@@ -178,10 +178,10 @@ class ManageMediaData implements RequestHandlerInterface
                         new Expression("COALESCE(setting_value, 'media/') AS media_folder"),
                     ]);
 
-                $query->where(new Expression('setting_value || multimedia_file_refn'), 'LIKE', $media_folder . '%');
+                $query->where(new Expression(DB::concat(['setting_value', 'multimedia_file_refn'])), 'LIKE', $media_folder . '%');
 
                 if ($subfolders === 'exclude') {
-                    $query->where(new Expression('setting_value || multimedia_file_refn'), 'NOT LIKE', $media_folder . '%/%');
+                    $query->where(new Expression(DB::concat(['setting_value', 'multimedia_file_refn'])), 'NOT LIKE', $media_folder . '%/%');
                 }
 
                 return $this->datatables_service->handleQuery($request, $query, $search_columns, $sort_columns, $callback);
@@ -250,7 +250,7 @@ class ManageMediaData implements RequestHandlerInterface
                         if (str_starts_with($row[0], $media_directory)) {
                             $tmp = substr($row[0], strlen($media_directory));
                             $create_form .=
-                                '<p><a href="#" data-bs-toggle="modal" data-bs-backdrop="static" data-bs-target="#modal-create-media-from-file" data-file="' . e($tmp) . '" data-url="' . e(route(CreateMediaObjectFromFile::class, ['tree' => $media_tree])) . '" onclick="document.getElementById(\'modal-create-media-from-file-form\').action=this.dataset.url; document.getElementById(\'file\').value=this.dataset.file;">' . I18N::translate('Create') . '</a> — ' . e($media_tree) . '<p>';
+                                '<p><a href="#" data-bs-toggle="modal" data-bs-target="#modal-create-media-from-file" data-file="' . e($tmp) . '" data-url="' . e(route(CreateMediaObjectFromFile::class, ['tree' => $media_tree])) . '" onclick="document.getElementById(\'modal-create-media-from-file-form\').action=this.dataset.url; document.getElementById(\'file\').value=this.dataset.file;">' . I18N::translate('Create') . '</a> — ' . e($media_tree) . '<p>';
                         }
                     }
 
@@ -367,7 +367,7 @@ class ManageMediaData implements RequestHandlerInterface
                 $imgsize = getimagesizefromstring($data_filesystem->read($file));
                 $html .= '<dt>' . I18N::translate('Image dimensions') . '</dt>';
                 /* I18N: image dimensions, width × height */
-                $html .= '<dd>' . I18N::translate('%1$s × %2$s pixels', I18N::number($imgsize['0']), I18N::number($imgsize['1'])) . '</dd>';
+                $html .= '<dd>' . I18N::translate('%1$s × %2$s pixels', I18N::number($imgsize[0]), I18N::number($imgsize[1])) . '</dd>';
             } catch (FilesystemException | UnableToReadFile | Throwable $ex) {
                 // Not an image, or not a valid image?
             }

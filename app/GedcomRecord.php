@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,6 @@ use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Elements\RestrictionNotice;
 use Fisharebest\Webtrees\Http\RequestHandlers\GedcomRecordPage;
 use Fisharebest\Webtrees\Services\PendingChangesService;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
 use function app;
@@ -53,7 +52,6 @@ use function route;
 use function str_contains;
 use function str_ends_with;
 use function str_pad;
-use function str_replace;
 use function str_starts_with;
 use function strtoupper;
 use function strtr;
@@ -951,33 +949,6 @@ class GedcomRecord
         }
 
         Log::addEditLog('Delete: ' . static::RECORD_TYPE . ' ' . $this->xref, $this->tree);
-    }
-
-    /**
-     * Remove all links from this record to $xref
-     *
-     * @param string $xref
-     * @param bool   $update_chan
-     *
-     * @return void
-     */
-    public function removeLinks(string $xref, bool $update_chan): void
-    {
-        $value = '@' . $xref . '@';
-
-        foreach ($this->facts() as $fact) {
-            if ($fact->value() === $value) {
-                $this->deleteFact($fact->id(), $update_chan);
-            } elseif (preg_match_all('/\n(\d) ' . Gedcom::REGEX_TAG . ' ' . $value . '/', $fact->gedcom(), $matches, PREG_SET_ORDER)) {
-                $gedcom = $fact->gedcom();
-                foreach ($matches as $match) {
-                    $next_level  = 1 + (int) $match[1];
-                    $next_levels = '[' . $next_level . '-9]';
-                    $gedcom      = preg_replace('/' . $match[0] . '(\n' . $next_levels . '.*)*/', '', $gedcom);
-                }
-                $this->updateFact($fact->id(), $gedcom, $update_chan);
-            }
-        }
     }
 
     /**

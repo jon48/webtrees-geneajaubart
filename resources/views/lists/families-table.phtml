@@ -56,7 +56,7 @@ $("#<?= e($table_id) ?> > .wt-table-family").dataTable({
         /* Given names       */ { type: "text" },
         /* Surnames          */ { type: "text" },
         /* Age               */ { type: "num" },
-        /* Marriage date     */ { type: "num" },
+        /* Marriage date     */ { type: "text" },
         /* Anniversary       */ { type: "num" },
         /* Marriage place    */ { type: "text" },
         //MYARTJAUB-START
@@ -176,10 +176,8 @@ $("#<?= e($table_id) ?>")
                 <th><?= I18N::translate('Surname') ?></th>
                 <th><?= I18N::translate('Age') ?></th>
                 <th><?= I18N::translate('Marriage') ?></th>
-                <th>
-                    <span title="<?= I18N::translate('Anniversary') ?>">
-                        <?= view('icons/anniversary') ?>
-                    </span>
+                <th title="<?= I18N::translate('Anniversary') ?>">
+                    <?= view('icons/anniversary') ?>
                 </th>
                 <th><?= I18N::translate('Place') ?></th>
                 <!--  MYARTJAUB-START -->
@@ -187,7 +185,9 @@ $("#<?= e($table_id) ?>")
                 <th><?= $maj_issourced_marr['th'] ?></th>
                 <?php endif; ?>
                 <!--  MYARTJAUB-END -->
-                <th><i class="icon-children" title="<?= I18N::translate('Children') ?>"></i></th>
+                <th title="<?= I18N::translate('Children') ?>">
+                    <?= view('icons/children') ?>
+                </th>
                 <th><?= I18N::translate('Last change') ?></th>
                 <th hidden></th>
                 <th hidden></th>

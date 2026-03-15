@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,8 +30,6 @@ use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
 
 /**
- * Test ManageMediaData class.
- *
  * @covers \Fisharebest\Webtrees\Http\RequestHandlers\ManageMediaData
  */
 class ManageMediaDataTest extends TestCase
@@ -96,8 +94,8 @@ class ManageMediaDataTest extends TestCase
             'media_folder' => 'media/',
             'subfolders'   => 'include',
             'search'       => ['value' => ''],
-            'start'        => '0',
-            'length'       => '10',
+            'start'  => '0',
+            'length' => '10',
         ]);
         $response              = $handler->handle($request);
 

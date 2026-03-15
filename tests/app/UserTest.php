@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,20 +20,16 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees;
 
 use Fisharebest\Webtrees\Contracts\CacheFactoryInterface;
-use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Services\UserService;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 
 /**
- * Test the user functions
+ * @covers \Fisharebest\Webtrees\User
  */
 class UserTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * Things to run before every test.
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,34 +39,16 @@ class UserTest extends TestCase
         Registry::cache($cache_factory);
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\User::__construct
-     * @covers \Fisharebest\Webtrees\User::id
-     * @covers \Fisharebest\Webtrees\User::email
-     * @covers \Fisharebest\Webtrees\User::realName
-     * @covers \Fisharebest\Webtrees\User::userName
-     */
     public function testConstructor(): void
     {
         $user = new User(123, 'username', 'real name', 'email');
 
-        self::assertInstanceOf(UserInterface::class, $user);
         self::assertSame(123, $user->id());
         self::assertSame('email', $user->email());
         self::assertSame('real name', $user->realName());
         self::assertSame('username', $user->userName());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\User::setUserName
-     * @covers \Fisharebest\Webtrees\User::userName
-     * @covers \Fisharebest\Webtrees\User::setRealName
-     * @covers \Fisharebest\Webtrees\User::realName
-     * @covers \Fisharebest\Webtrees\User::setEmail
-     * @covers \Fisharebest\Webtrees\User::email
-     * @covers \Fisharebest\Webtrees\User::setPassword
-     * @covers \Fisharebest\Webtrees\User::checkPassword
-     */
     public function testGettersAndSetters(): void
     {
         $user_service = new UserService();
@@ -95,10 +73,6 @@ class UserTest extends TestCase
         self::assertTrue($user->checkPassword('letmein'));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\User::setPreference
-     * @covers \Fisharebest\Webtrees\User::getPreference
-     */
     public function testPreferences(): void
     {
         $user_service = new UserService();

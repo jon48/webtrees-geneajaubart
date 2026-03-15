@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,15 +24,12 @@ use Fisharebest\Webtrees\Contracts\UserInterface;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 
 /**
- * Test the DefaultUser class
+ * @covers \Fisharebest\Webtrees\DefaultUser
  */
 class DefaultUserTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * Things to run before every test.
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -42,28 +39,16 @@ class DefaultUserTest extends TestCase
         Registry::cache($cache_factory);
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\DefaultUser::__construct
-     * @covers \Fisharebest\Webtrees\DefaultUser::id
-     * @covers \Fisharebest\Webtrees\DefaultUser::email
-     * @covers \Fisharebest\Webtrees\DefaultUser::realName
-     * @covers \Fisharebest\Webtrees\DefaultUser::userName
-     */
     public function testDefaultUser(): void
     {
         $user = new DefaultUser();
 
-        self::assertInstanceOf(UserInterface::class, $user);
         self::assertSame(-1, $user->id());
         self::assertSame('DEFAULT_USER', $user->email());
         self::assertSame('DEFAULT_USER', $user->realName());
         self::assertSame('', $user->userName());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\DefaultUser::getPreference
-     * @covers \Fisharebest\Webtrees\DefaultUser::setPreference
-     */
     public function testPreferences(): void
     {
         $user = new DefaultUser();

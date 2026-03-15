@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,15 +24,12 @@ use Fisharebest\Webtrees\Http\Exceptions\HttpServerErrorException;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\TreeService;
-use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\Webtrees;
 use Illuminate\Support\Collection;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * Test the HandleExceptions middleware.
- *
  * @covers \Fisharebest\Webtrees\Http\Middleware\HandleExceptions
  */
 class HandleExceptionsTest extends TestCase

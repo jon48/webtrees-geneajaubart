@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,6 @@ use Fisharebest\Webtrees\Module\ModuleInterface;
 use Fisharebest\Webtrees\Module\ModuleListInterface;
 use Fisharebest\Webtrees\Module\PlaceHierarchyListModule;
 use Fisharebest\Webtrees\Services\ModuleService;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
 use function app;
@@ -240,8 +239,6 @@ class Place
 
     /**
      * Format this place for display on screen.
-     *
-     * @return string
      */
     public function placeName(): string
     {
@@ -252,10 +249,6 @@ class Place
 
     /**
      * Generate the place name for display, including the full hierarchy.
-     *
-     * @param bool $link
-     *
-     * @return string
      */
     public function fullName(bool $link = false): string
     {
@@ -266,7 +259,11 @@ class Place
         $full_name = $this->parts->implode(I18N::$list_separator);
 
         if ($link) {
-            return '<a dir="auto" href="' . e($this->url()) . '">' . e($full_name) . '</a>';
+            $url = $this->url();
+
+            if ($url !== '#') {
+                return '<a class="ut" href="' . e($url) . '">' . e($full_name) . '</a>';
+            }
         }
 
         return '<bdi>' . e($full_name) . '</bdi>';
@@ -274,10 +271,6 @@ class Place
 
     /**
      * For lists and charts, where the full name won’t fit.
-     *
-     * @param bool $link
-     *
-     * @return string
      */
     public function shortName(bool $link = false): string
     {
@@ -292,13 +285,16 @@ class Place
 
         $short_name = $parts->implode(I18N::$list_separator);
 
-        // Add a tool-tip showing the full name
-        $title = strip_tags($this->fullName());
-
         if ($link) {
-            return '<a dir="auto" href="' . e($this->url()) . '" title="' . $title . '">' . e($short_name) . '</a>';
+            $url = $this->url();
+
+            if ($url !== '#') {
+                $title = strip_tags($this->fullName());
+
+                return '<a class="ut" href="' . e($url) . '" title="' . e($title) . '">' . e($short_name) . '</a>';
+            }
         }
 
-        return '<bdi>' . e($short_name) . '</bdi>';
+        return '<span class="ut">' . e($short_name) . '</span>';
     }
 }

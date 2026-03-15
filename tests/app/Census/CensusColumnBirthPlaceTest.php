@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,7 +24,8 @@ use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\TestCase;
 
 /**
- * Test harness for the class CensusColumnBirthPlace
+ * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthPlace
+ * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
  */
 class CensusColumnBirthPlaceTest extends TestCase
 {
@@ -36,10 +37,6 @@ class CensusColumnBirthPlaceTest extends TestCase
         return $placeMock;
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testPlaceCountry(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -53,10 +50,6 @@ class CensusColumnBirthPlaceTest extends TestCase
         self::assertSame('Westminster, London', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testPlaceAndCountry(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -70,10 +63,6 @@ class CensusColumnBirthPlaceTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testDifferentCountry(): void
     {
         $individual = $this->createMock(Individual::class);

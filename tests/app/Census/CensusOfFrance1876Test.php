@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,15 +22,10 @@ namespace Fisharebest\Webtrees\Census;
 use Fisharebest\Webtrees\TestCase;
 
 /**
- * Test harness for the class CensusOfFrance1876
+ * @covers \Fisharebest\Webtrees\Census\CensusOfFrance1876
  */
 class CensusOfFrance1876Test extends TestCase
 {
-    /**
-     * Test the census place and date
-     *
-     * @covers \Fisharebest\Webtrees\Census\CensusOfFrance1876
-     */
     public function testPlaceAndDate(): void
     {
         $census = new CensusOfFrance1876();
@@ -39,12 +34,6 @@ class CensusOfFrance1876Test extends TestCase
         self::assertSame('20 JAN 1876', $census->censusDate());
     }
 
-    /**
-     * Test the census columns
-     *
-     * @covers \Fisharebest\Webtrees\Census\CensusOfFrance1876
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testColumns(): void
     {
         $census  = new CensusOfFrance1876();

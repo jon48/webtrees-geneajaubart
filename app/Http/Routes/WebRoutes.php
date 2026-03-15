@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,6 +27,7 @@ use Fisharebest\Webtrees\Http\Middleware\AuthEditor;
 use Fisharebest\Webtrees\Http\Middleware\AuthLoggedIn;
 use Fisharebest\Webtrees\Http\Middleware\AuthManager;
 use Fisharebest\Webtrees\Http\Middleware\AuthModerator;
+use Fisharebest\Webtrees\Http\Middleware\AuthNotRobot;
 use Fisharebest\Webtrees\Http\RequestHandlers\AccountDelete;
 use Fisharebest\Webtrees\Http\RequestHandlers\AccountEdit;
 use Fisharebest\Webtrees\Http\RequestHandlers\AccountUpdate;
@@ -661,15 +662,8 @@ class WebRoutes
                 $router->get(VerifyEmail::class, '/verify/{username}/{token}{/tree}');
             });
 
-            // Visitor routes with a tree.
+            // Visitor routes with a tree (robots allowed).
             $router->attach('', '/tree/{tree}', static function (Map $router) {
-                $router->get(TreePage::class, '');
-                $router->get(AutoCompleteSurname::class, '/autocomplete/surname');
-                $router->get(CalendarPage::class, '/calendar/{view}');
-                $router->post(CalendarAction::class, '/calendar/{view}');
-                $router->get(CalendarEvents::class, '/calendar-events/{view}');
-                $router->get(ContactPage::class, '/contact');
-                $router->post(ContactAction::class, '/contact');
                 $router->get(FamilyPage::class, '/family/{xref}{/slug}')->tokens(['slug' => '.*']);
                 $router->get(HeaderPage::class, '/header/{xref}{/slug}')->tokens(['slug' => '.*']);
                 $router->get(IndividualPage::class, '/individual/{xref}{/slug}')->tokens(['slug' => '.*']);
@@ -681,6 +675,28 @@ class WebRoutes
                 $router->get(SharedNotePage::class, '/shared-note/{xref}{/slug}')->tokens(['slug' => '.*']);
                 $router->get(GedcomRecordPage::class, '/record/{xref}{/slug}')->tokens(['slug' => '.*']);
                 $router->get(RepositoryPage::class, '/repository/{xref}{/slug}')->tokens(['slug' => '.*']);
+                $router->get(SourcePage::class, '/source/{xref}{/slug}')->tokens(['slug' => '.*']);
+                $router->get(SubmissionPage::class, '/submission/{xref}{/slug}')->tokens(['slug' => '.*']);
+                $router->get(SubmitterPage::class, '/submitter/{xref}{/slug}')->tokens(['slug' => '.*']);
+                $router->get(TreePage::class, '');
+                $router->get(TreePageBlock::class, '/tree-page-block');
+                $router->get('example', '/…')->isRoutable(false);
+            });
+
+            // Visitor routes with a tree (robots not allowed).
+            $router->attach('', '/tree/{tree}', static function (Map $router) {
+                $router->extras([
+                    'middleware' => [
+                        AuthNotRobot::class,
+                    ],
+                ]);
+
+                $router->get(AutoCompleteSurname::class, '/autocomplete/surname');
+                $router->get(ContactPage::class, '/contact');
+                $router->post(ContactAction::class, '/contact');
+                $router->get(CalendarPage::class, '/calendar/{view}');
+                $router->post(CalendarAction::class, '/calendar/{view}');
+                $router->get(CalendarEvents::class, '/calendar-events/{view}');
                 $router->get(ReportListPage::class, '/report');
                 $router->post(ReportListAction::class, '/report');
                 $router->get(ReportSetupPage::class, '/report/{report}');
@@ -693,9 +709,6 @@ class WebRoutes
                 $router->get(SearchPhoneticPage::class, '/search-phonetic');
                 $router->post(SearchPhoneticAction::class, '/search-phonetic');
                 $router->post(SearchQuickAction::class, '/search-quick');
-                $router->get(SourcePage::class, '/source/{xref}{/slug}')->tokens(['slug' => '.*']);
-                $router->get(SubmissionPage::class, '/submission/{xref}{/slug}')->tokens(['slug' => '.*']);
-                $router->get(SubmitterPage::class, '/submitter/{xref}{/slug}')->tokens(['slug' => '.*']);
                 $router->get(TomSelectFamily::class, '/tom-select-family');
                 $router->get(TomSelectIndividual::class, '/tom-select-individual');
                 $router->get(TomSelectLocation::class, '/tom-select-location');
@@ -707,9 +720,6 @@ class WebRoutes
                 $router->get(TomSelectSubmission::class, '/tom-select-submission');
                 $router->get(TomSelectSubmitter::class, '/tom-select-submitter');
                 $router->get(TomSelectRepository::class, '/tom-select-repository');
-                $router->get(TreePageBlock::class, '/tree-page-block');
-                $router->get('example', '/…')
-                    ->isRoutable(false);
             });
 
             // Match module routes, with and without a tree.

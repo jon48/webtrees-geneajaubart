@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,17 +19,24 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
+use Fisharebest\Webtrees\Fact;
+use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\TestCase;
 
 /**
- * Test harness for the class CzechMonarchsAndPresidents
- *
  * @covers \Fisharebest\Webtrees\Module\CzechMonarchsAndPresidents
  */
 class CzechMonarchsAndPresidentsTest extends TestCase
 {
-    public function testClass(): void
+    public function testEventsHaveValidDate(): void
     {
-        $this->assertTrue(class_exists(\Fisharebest\Webtrees\Module\CzechMonarchsAndPresidents::class));
+        $module = new CzechMonarchsAndPresidents();
+
+        $individual = $this->createMock(Individual::class);
+
+        foreach ($module->historicEventsAll() as $gedcom) {
+            $fact = new Fact($gedcom, $individual, 'test');
+            self::assertTrue($fact->date()->isOK(), 'No date found in: ' . $gedcom);
+        }
     }
 }

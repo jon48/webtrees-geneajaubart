@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 
 /**
+ * @var string|null               $caption
  * @var Collection<int,Submitter> $submitters
  * @var Tree                      $tree
  */
@@ -33,7 +34,7 @@ $count_individuals = DB::table('individuals')
     ->where('l_file', '=', $tree->id())
     ->groupBy(['l_to'])
     ->pluck(new Expression('COUNT(*) AS total'), 'l_to')
-    ->map(static fn (string $n) => (int) $n)
+    ->map(static fn (string $n): int => (int) $n)
     ->all();
 
 $count_families = DB::table('families')
@@ -45,7 +46,7 @@ $count_families = DB::table('families')
     ->where('l_file', '=', $tree->id())
     ->groupBy(['l_to'])
     ->pluck(new Expression('COUNT(*) AS total'), 'l_to')
-    ->map(static fn (string $n) => (int) $n)
+    ->map(static fn (string $n): int => (int) $n)
     ->all();
 ?>
 

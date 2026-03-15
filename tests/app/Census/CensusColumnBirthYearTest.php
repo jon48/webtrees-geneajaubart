@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,14 +25,11 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\TestCase;
 
 /**
- * Test harness for the class CensusColumnAge
+ * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthYear
+ * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
  */
 class CensusColumnBirthYearTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthYear
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testGenerateColumn(): void
     {
         $cal_date = $this->createMock(GregorianDate::class);

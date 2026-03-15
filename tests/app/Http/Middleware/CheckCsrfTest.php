@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,8 +29,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use function response;
 
 /**
- * Test the CheckCsrf middleware.
- *
  * @covers \Fisharebest\Webtrees\Http\Middleware\CheckCsrf
  */
 class CheckCsrfTest extends TestCase
@@ -40,8 +38,11 @@ class CheckCsrfTest extends TestCase
         $handler = $this->createMock(RequestHandlerInterface::class);
         $handler->method('handle')->willReturn(response());
 
+        $uri_factory = Webtrees::make(UriFactoryInterface::class);
+        self::assertInstanceOf(UriFactoryInterface::class, $uri_factory);
+
         $request = self::createRequest(RequestMethodInterface::METHOD_POST)
-            ->withUri(Webtrees::make(UriFactoryInterface::class)->createUri('https://example.com'));
+            ->withUri($uri_factory->createUri('https://example.com'));
 
         $middleware = new CheckCsrf();
         $response   = $middleware->process($request, $handler);

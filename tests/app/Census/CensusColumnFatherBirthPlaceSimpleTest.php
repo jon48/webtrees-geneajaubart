@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,8 @@ use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
 
 /**
- * Test harness for the class CensusColumnFatherBirthPlaceSimple
+ * @covers \Fisharebest\Webtrees\Census\CensusColumnFatherBirthPlaceSimple
+ * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
  */
 class CensusColumnFatherBirthPlaceSimpleTest extends TestCase
 {
@@ -41,10 +42,6 @@ class CensusColumnFatherBirthPlaceSimpleTest extends TestCase
         return $placeMock;
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnFatherBirthPlaceSimple
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
     public function testKnownStateAndTown(): void
     {
         $father = $this->createMock(Individual::class);

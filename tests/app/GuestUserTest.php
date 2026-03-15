@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,50 +22,30 @@ namespace Fisharebest\Webtrees;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 
 /**
- * Test the GuestUser class
+ * @covers \Fisharebest\Webtrees\GuestUser
  */
 class GuestUserTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\GuestUser::__construct
-     * @covers \Fisharebest\Webtrees\GuestUser::id
-     * @covers \Fisharebest\Webtrees\GuestUser::email
-     * @covers \Fisharebest\Webtrees\GuestUser::realName
-     * @covers \Fisharebest\Webtrees\GuestUser::userName
-     */
     public function testAnonymous(): void
     {
         $user = new GuestUser();
 
-        self::assertInstanceOf(UserInterface::class, $user);
         self::assertSame(0, $user->id());
         self::assertSame('GUEST_USER', $user->email());
         self::assertSame('GUEST_USER', $user->realName());
         self::assertSame('', $user->userName());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\GuestUser::__construct
-     * @covers \Fisharebest\Webtrees\GuestUser::id
-     * @covers \Fisharebest\Webtrees\GuestUser::email
-     * @covers \Fisharebest\Webtrees\GuestUser::realName
-     * @covers \Fisharebest\Webtrees\GuestUser::userName
-     */
     public function testVisitor(): void
     {
         $user = new GuestUser('guest@example.com', 'guest user');
 
-        self::assertInstanceOf(UserInterface::class, $user);
         self::assertSame(0, $user->id());
         self::assertSame('guest@example.com', $user->email());
         self::assertSame('guest user', $user->realName());
         self::assertSame('', $user->userName());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\GuestUser::getPreference
-     * @covers \Fisharebest\Webtrees\GuestUser::setPreference
-     */
     public function testPreferences(): void
     {
         $user = new GuestUser();

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,14 +23,13 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Services\DataFixService;
 use Fisharebest\Webtrees\Services\GedcomImportService;
 use Fisharebest\Webtrees\Services\TreeService;
+use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Session;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 
 /**
- * Class FixDuplicateLinksTest.
- *
  * @covers \Fisharebest\Webtrees\Module\FixDuplicateLinks
  * @covers \Fisharebest\Webtrees\Module\ModuleDataFixTrait
  */
@@ -44,9 +43,6 @@ class FixDuplicateLinksTest extends TestCase
 
     protected bool $restore_session_user = false;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -56,15 +52,11 @@ class FixDuplicateLinksTest extends TestCase
 
         $this->fixDuplicateLinks = new FixDuplicateLinks(new DataFixService());
 
-        if (Auth::id() === null) {
-            Session::put('wt_user', 0);
-            $this->restore_session_user = true;
-        }
+        $user_service = new UserService();
+        $user         = $user_service->create('user', 'real', 'email', 'pass');
+        Auth::login($user);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -76,22 +68,15 @@ class FixDuplicateLinksTest extends TestCase
         unset($this->fixDuplicateLinks, $this->tree);
     }
 
-    /**
-     * Test the module returns a title and a description
-     */
     public function testModuleMetadata(): void
     {
         self::assertNotEmpty($this->fixDuplicateLinks->title());
         self::assertNotEmpty($this->fixDuplicateLinks->description());
     }
 
-    /**
-     * Test the trait's recordsToFix method
-     */
     public function testRecordsToFix(): void
     {
         $records = $this->fixDuplicateLinks->recordsToFix($this->tree, []);
-        self::assertInstanceOf(Collection::class, $records);
         self::assertCount(1, $records);
 
         $records = $this->fixDuplicateLinks->recordsToFix($this->tree, ['start' => 'X1', 'end' => 'X9']);
@@ -101,9 +86,6 @@ class FixDuplicateLinksTest extends TestCase
         self::assertCount(0, $records);
     }
 
-    /**
-     * Test the doesRecordNeedUpdate method on a negative and positive test
-     */
     public function testDoesRecordNeedUpdate(): void
     {
         $family = $this->tree->createFamily("0 @@ FAM\n1 HUSB @X1@\n1 CHIL @X2@");
@@ -113,9 +95,6 @@ class FixDuplicateLinksTest extends TestCase
         self::assertTrue($this->fixDuplicateLinks->doesRecordNeedUpdate($family, []));
     }
 
-    /**
-     * Test the preview of the update
-     */
     public function testPreviewUpdate(): void
     {
         $family = $this->tree->createFamily("0 @@ FAM\n1 HUSB @X1@\n1 CHIL @X2@\n1 CHIL @X2@");
@@ -126,9 +105,6 @@ class FixDuplicateLinksTest extends TestCase
         );
     }
 
-    /**
-     * Test the update of the record
-     */
     public function testUpdateRecord(): void
     {
         $family = $this->tree->createFamily("0 @@ FAM\n1 HUSB @X1@\n1 CHIL @X2@\n1 CHIL @X2@");

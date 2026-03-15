@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,35 +22,24 @@ namespace Fisharebest\Webtrees;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 
 /**
- * Test the SiteUser class
+ * @covers \Fisharebest\Webtrees\SiteUser
  */
 class SiteUserTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @covers \Fisharebest\Webtrees\SiteUser::id
-     * @covers \Fisharebest\Webtrees\SiteUser::email
-     * @covers \Fisharebest\Webtrees\SiteUser::realName
-     * @covers \Fisharebest\Webtrees\SiteUser::userName
-     */
     public function testConstructor(): void
     {
         $user = new SiteUser();
         Site::setPreference('SMTP_FROM_NAME', 'email@example.com');
         Site::setPreference('SMTP_DISP_NAME', 'My site');
 
-        self::assertInstanceOf(UserInterface::class, $user);
         self::assertSame(0, $user->id());
         self::assertSame('email@example.com', $user->email());
         self::assertSame('My site', $user->realName());
         self::assertSame('', $user->userName());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\SiteUser::getPreference
-     * @covers \Fisharebest\Webtrees\SiteUser::setPreference
-     */
     public function testPreferences(): void
     {
         $user = new SiteUser();

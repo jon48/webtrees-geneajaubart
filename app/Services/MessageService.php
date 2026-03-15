@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,12 +21,12 @@ namespace Fisharebest\Webtrees\Services;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\SiteUser;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\User;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
 use function array_filter;
@@ -98,7 +98,7 @@ class MessageService
 
         // Temporarily switch to the recipient's language
         $old_language = I18N::languageTag();
-        I18N::init($recipient->getPreference(UserInterface::PREF_LANGUAGE));
+        I18N::init($recipient->getPreference(UserInterface::PREF_LANGUAGE, 'en-US'));
 
         $body_text = view('emails/message-user-text', [
             'sender'    => $sender,

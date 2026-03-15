@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Services;
 
 use Fisharebest\Webtrees\Date;
-use Fisharebest\Webtrees\Elements\UnknownElement;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Exceptions\GedcomErrorException;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
@@ -38,7 +38,6 @@ use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Submission;
 use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\JoinClause;
 
 use function app;
@@ -258,6 +257,9 @@ class GedcomImportService
             $tree->setPreference('imported', '1');
             $type = 'TRLR';
             $xref = 'TRLR'; // For records without an XREF, use the type as a pseudo XREF.
+        } elseif (preg_match('/^0 (_PTF|_PTE|_STF|_STE|_PLAC|_PEG|LABL) @/', $gedrec) === 1) {
+            // MacFamilyTree creates these records with duplicate XREFs.  We can't import these. See #5125
+            return;
         } elseif (str_starts_with($gedrec, '0 _PLAC_DEFN')) {
             $this->importLegacyPlacDefn($gedrec);
 
@@ -278,10 +280,7 @@ class GedcomImportService
 
         // Add a _UID
         if ($tree->getPreference('GENERATE_UIDS') === '1' && !str_contains($gedrec, "\n1 _UID ")) {
-            $element = Registry::elementFactory()->make($type . ':_UID');
-            if (!$element instanceof UnknownElement) {
-                $gedrec .= "\n1 _UID " . $element->default($tree);
-            }
+            $gedrec .= "\n1 _UID " . Registry::idFactory()->pafUid();
         }
 
         // If the user has downloaded their GEDCOM data (containing media objects) and edited it

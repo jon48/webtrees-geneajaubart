@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -39,15 +39,15 @@ class SiteLogsDataTest extends TestCase
             ['tree' => 'a', 'from' => 'b', 'to' => 'c', 'type' => 'd', 'text' => 'e', 'ip' => 'f', 'username' => 'g']
         );
 
-        $query = $this->createStub(Builder::class);
+        $query = $this->createMock(Builder::class);
 
-        $site_logs_service = $this->createStub(SiteLogsService::class);
+        $site_logs_service = $this->createMock(SiteLogsService::class);
         $site_logs_service->method('logsQuery')->willReturn($query);
 
-        $response = $this->createStub(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(StatusCodeInterface::STATUS_OK);
 
-        $data_tables_service = $this->createStub(DatatablesService::class);
+        $data_tables_service = $this->createMock(DatatablesService::class);
         $data_tables_service->method('handleQuery')->willReturn($response);
 
         $handler  = new SiteLogsData($data_tables_service, $site_logs_service);

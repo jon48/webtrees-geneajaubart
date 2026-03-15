@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,24 +21,31 @@ namespace Fisharebest\Webtrees\Census;
 
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\TestCase;
+use Illuminate\Support\Collection;
 
 /**
- * Test harness for the class CensusColumnRelationToHead
+ * @covers \Fisharebest\Webtrees\Census\CensusColumnRelationToHead
+ * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
  */
 class CensusColumnRelationToHeadTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnRelationToHead
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
+    protected static bool $uses_database = true;
+
     public function testNull(): void
     {
-        $individual = $this->createMock(Individual::class);
+        $individual1 = $this->createMock(Individual::class);
+        $individual2 = $this->createMock(Individual::class);
+
+        $individual1->method('childFamilies')->willReturn(new Collection());
+        $individual1->method('spouseFamilies')->willReturn(new Collection());
+        $individual2->method('childFamilies')->willReturn(new Collection());
+        $individual2->method('spouseFamilies')->willReturn(new Collection());
 
         $census = $this->createMock(CensusInterface::class);
 
         $column = new CensusColumnRelationToHead($census, '', '');
 
-        self::assertSame('-', $column->generate($individual, $individual));
+        self::assertSame('-', $column->generate($individual1, $individual1));
+        self::assertSame('', $column->generate($individual1, $individual2));
     }
 }

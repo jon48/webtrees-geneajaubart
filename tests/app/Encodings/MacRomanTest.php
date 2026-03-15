@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,18 +19,16 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Tests\Encodings;
 
+use Fisharebest\Webtrees\Encodings\AbstractEncoding;
 use Fisharebest\Webtrees\Encodings\MacRoman;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests for class MacRoman.
+ * @covers \Fisharebest\Webtrees\Encodings\AbstractEncoding
+ * @covers \Fisharebest\Webtrees\Encodings\MacRoman
  */
 class MacRomanTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Encodings\AbstractEncoding
-     * @covers \Fisharebest\Webtrees\Encodings\MacRoman
-     */
     public function testToUtf8HexStrings(): void
     {
         $encoding = new MacRoman();
@@ -93,10 +91,6 @@ class MacRomanTest extends TestCase
         );
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Encodings\AbstractEncoding
-     * @covers \Fisharebest\Webtrees\Encodings\MacRoman
-     */
     public function testToUtf8StringLiterals(): void
     {
         $encoding = new MacRoman();

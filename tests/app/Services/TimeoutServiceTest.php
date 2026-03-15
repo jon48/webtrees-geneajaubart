@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -41,7 +41,7 @@ function ini_get(...$args)
 }
 
 /**
- * Test harness for the class TimeoutService
+ * @covers \Fisharebest\Webtrees\Services\TimeoutService
  */
 class TimeoutServiceTest extends TestCase
 {
@@ -54,15 +54,11 @@ class TimeoutServiceTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::setUp();
-
         self::$mock_functions = null;
+
+        parent::tearDown();
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::__construct
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::isTimeNearlyUp
-     */
     public function testNoTimeOut(): void
     {
         $now = 1500000000.0;
@@ -77,10 +73,6 @@ class TimeoutServiceTest extends TestCase
         self::assertFalse($timeout_service->isTimeNearlyUp());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::__construct
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::isTimeNearlyUp
-     */
     public function testTimeOutReached(): void
     {
         $now = 1500000000.0;
@@ -99,10 +91,6 @@ class TimeoutServiceTest extends TestCase
         self::assertTrue($timeout_service->isTimeNearlyUp());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::__construct
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::isTimeNearlyUp
-     */
     public function testTimeOutNotReached(): void
     {
         $now = Registry::timeFactory()->now();
@@ -121,10 +109,6 @@ class TimeoutServiceTest extends TestCase
         self::assertFalse($timeout_service->isTimeNearlyUp());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::__construct
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::isTimeLimitUp
-     */
     public function testTimeLimitNotReached(): void
     {
         $now = Registry::timeFactory()->now();
@@ -138,10 +122,6 @@ class TimeoutServiceTest extends TestCase
         self::assertFalse($timeout_service->isTimeLimitUp());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::__construct
-     * @covers \Fisharebest\Webtrees\Services\TimeoutService::isTimeLimitUp
-     */
     public function testTimeLimitReached(): void
     {
         $now = Registry::timeFactory()->now();

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\Individual;
@@ -29,7 +30,6 @@ use Fisharebest\Webtrees\Repository;
 use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 
@@ -57,7 +57,7 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<int,object>
+     * @return Collection<int,object{xref:string,type:string}>
      */
     public function recordsToFix(Tree $tree, array $params): Collection
     {
@@ -408,7 +408,7 @@ trait ModuleDataFixTrait
      * @param Tree                   $tree
      * @param string                 $type
      *
-     * @return Collection<int,object>
+     * @return Collection<int,object{xref:string,type:string}>
      */
     private function mergePendingRecords(Collection $records, Tree $tree, string $type): Collection
     {
