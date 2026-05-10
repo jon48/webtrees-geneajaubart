@@ -1,7 +1,0 @@
-{
-    "require-dev": {
-        "phpstan/phpstan-deprecation-rules": "^2.0",
-        "phpstan/phpstan": "^2.1",
-        "phpstan/phpstan-strict-rules": "^2.0"
-    }
-}
