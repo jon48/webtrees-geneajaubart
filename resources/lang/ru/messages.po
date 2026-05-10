@@ -3,14 +3,16 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-30 20:50+0000\n"
-"PO-Revision-Date: 2024-07-26 11:40+0000\n"
-"Last-Translator: ol810 <uolega@yandex.ru>\n"
-"Language-Team: Russian <https://translate.webtrees.net/projects/webtrees/webtrees/ru/>\n"
+"PO-Revision-Date: 2026-03-18 03:11+0000\n"
+"Last-Translator: Reveritus <t102b@yandex.ru>\n"
+"Language-Team: Russian <https://translate.webtrees.net/projects/webtrees/"
+"webtrees/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Weblate 4.14.2\n"
 "X-Language: ru_RU\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -77,7 +79,7 @@ msgstr "%1$s KB было загружено за %2$s секунд."
 #: app/Http/RequestHandlers/CheckTree.php:278
 #, php-format
 msgid "%1$s does not exist. Did you mean %2$s?"
-msgstr "%1$s Не существует. Возможно, Вы имели в виду %2$s?"
+msgstr "%1$s не существует. Возможно, Вы имели в виду %2$s?"
 
 #: app/Http/RequestHandlers/CheckTree.php:260
 #: app/Http/RequestHandlers/CheckTree.php:265
@@ -156,7 +158,7 @@ msgstr "%1$s–%2$s"
 #: app/Services/RelationshipService.php:2204
 #, php-format
 msgid "%1$s’s %2$s"
-msgstr "%1$s бывший/бывшая %2$s"
+msgstr "%1$s неполнородн(ый/ая) %2$s"
 
 #. I18N: This is the format string for the time-of-day. See https://php.net/date for codes
 #: app/I18N.php:603
@@ -193,7 +195,7 @@ msgstr "%s и его предки"
 #: app/Module/ClippingsCartModule.php:702
 #, php-format
 msgid "%s and the individuals that reference it."
-msgstr "%s и лица, которые на нее ссылаются."
+msgstr "%s и лица, ссылающиеся на это."
 
 #. I18N: %s is a family (husband + wife)
 #: app/Module/ClippingsCartModule.php:385
@@ -1351,7 +1353,7 @@ msgstr "Добавить мать"
 
 #: resources/views/individual-page-menu.phtml:45
 msgid "Add a name"
-msgstr "Добавить новое имя"
+msgstr "Добавить имя"
 
 #: resources/views/modules/gedcom_news/list.phtml:63
 msgid "Add a news article"
@@ -3341,7 +3343,7 @@ msgstr "Причина смерти"
 #: resources/views/admin/trees-merge.phtml:66
 #: resources/views/admin/trees-renumber.phtml:47
 msgid "Caution! This may take a long time. Be patient."
-msgstr "Внимание! Это может занять много времени. Будьте терпеливы."
+msgstr "Внимание! Это может занять много времени. Наберитесь терпения."
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:153
@@ -3570,7 +3572,7 @@ msgstr "Детей в семье"
 #: resources/xml/reports/ahnentafel_report.xml:391
 #: resources/xml/reports/descendancy_report.xml:483
 msgid "Children of "
-msgstr "Дети от "
+msgstr "Дети "
 
 #. I18N: In the Icelandic surname tradition, ...
 #: app/SurnameTradition/IcelandicSurnameTradition.php:52
@@ -3580,12 +3582,12 @@ msgstr "Дети перенимают отчество вместо фамили
 #. I18N: In the Spanish surname tradition, ...
 #: app/SurnameTradition/SpanishSurnameTradition.php:53
 msgid "Children take one surname from the father and one surname from the mother."
-msgstr "Дети перенимают одну фамилию отца и одну матери."
+msgstr "Дети перенимают одну фамилию от отца и одну от матери."
 
 #. I18N: In the Portuguese surname tradition, ...
 #: app/SurnameTradition/PortugueseSurnameTradition.php:53
 msgid "Children take one surname from the mother and one surname from the father."
-msgstr "Дети перенимают одну фамилию матери и одну отца."
+msgstr "Дети перенимают одну фамилию от матери и одну от отца."
 
 #. I18N: In the patrilineal surname tradition, ...
 #: app/SurnameTradition/LithuanianSurnameTradition.php:76
@@ -3840,7 +3842,7 @@ msgstr "Законный брак"
 
 #: app/Elements/MarriageType.php:61
 msgid "Common-law marriage"
-msgstr ""
+msgstr "Гражданский брак"
 
 #. I18N: Description of the “Messages” module
 #: app/Module/UserMessagesModule.php:76
@@ -4049,7 +4051,9 @@ msgstr "Корпорация"
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixNameSlashesAndSpaces.php:67
 msgid "Correct NAME records of the form “John/DOE/” or “John /DOE”, as produced by older genealogy programs."
-msgstr "Исправить записи имени NAME как 'Иван/ИВАНОВ/' или 'Иван /ИВАНОВ', которые создаются устарелыми генеалогическими программами."
+msgstr ""
+"Исправить записи имени NAME как 'Иван/ИВАНОВ/' или 'Иван /ИВАНОВ', которые "
+"создаются устаревшими генеалогическими программами."
 
 #: app/Elements/ResearchTaskStatus.php:52 app/Elements/ResearchTaskType.php:51
 msgid "Correspondence"
@@ -4684,7 +4688,7 @@ msgstr "Дочь"
 #: app/Module/InteractiveTree/TreeView.php:367
 #, php-format
 msgid "Daughter of %s"
-msgstr "Дочь от %s"
+msgstr "Дочь %s"
 
 #: app/Module/CalendarMenuModule.php:91 resources/views/calendar-page.phtml:43
 msgid "Day"
@@ -5130,7 +5134,7 @@ msgstr "Удалить предпочтения для этого модуля."
 #: resources/views/individual-page-name.phtml:92
 #: resources/views/individual-page-name.phtml:94
 msgid "Delete this name"
-msgstr "Удалить имя"
+msgstr "Удалить это имя"
 
 #: resources/views/admin/locations.phtml:174
 msgid "Delete unused locations"
@@ -5329,7 +5333,7 @@ msgstr "Умер, как ребенок: исключается"
 #. I18N: LDS sealing status; see https://en.wikipedia.org/wiki/Sealing_(Mormonism)
 #: app/Elements/LdsOrdinanceStatus.php:75
 msgid "Died less than 1 year old, sealing not required."
-msgstr "Умер в возрасте до 1 года, герметизация не требуется."
+msgstr "Умер в возрасте до 1 года, запечатывание не требуется."
 
 #: resources/xml/reports/change_report.xml:60
 msgid "Differences"
@@ -5471,7 +5475,19 @@ msgstr "Пользователь с таким именем уже сущест�
 
 #: resources/views/help/source-events.phtml:10
 msgid "Each source records specific events, generally for a given date range and for a place jurisdiction. For example a Census records census events and church records record birth, marriage, and death events.<br><br>Select the events that are recorded by this source from the list of events provided. The date should be specified in a range format such as <i>FROM 1900 TO 1910</i>. The place jurisdiction is the name of the lowest jurisdiction that encompasses all lower-level places named in this source. For example, “Oneida, Idaho, USA” would be used as a source jurisdiction place for events occurring in the various towns within Oneida County. “Idaho, USA” would be the source jurisdiction place if the events recorded took place not only in Oneida County but also in other counties in Idaho."
-msgstr "Каждый источник записывает конкретные события, как правило, для данного диапазона дат и административной области. Например, переписи населения, переписи события, церковные записи, запись о рождении, браке, и смерть.<br><br>Выберите события, которые записываются с помощью этого источника из списка событий. Даты должны быть указаны в формате диапазона, например, <i>с 1900 по 1910</i>. Административная область - это название маленькой административной единицы, которая включает в себя все места в этом источнике. Например, «Онейда, штат Айдахо, США» будут использоваться в качестве источника административной области для событий, происходящих в разных городах в пределах Oneida County. «Штат Айдахо, США» будет административной области, если описанные события имели место не только в Oneida County, но и в других уездах в Айдахо."
+msgstr ""
+"Каждый источник записывает конкретные события, как правило, для данного "
+"диапазона дат и административной области. Например, переписи населения, "
+"переписи события, церковные записи, запись о рождении, браке, и "
+"смерти.<br><br>Выберите события, которые записываются с помощью этого "
+"источника из списка событий. Даты должны быть указаны в формате диапазона, "
+"например, <i>с 1900 по 1910</i>. Административная область - это название "
+"маленькой административной единицы, которая включает в себя все места в этом "
+"источнике. Например, «Онайда, штат Айдахо, США» будут использоваться в "
+"качестве источника административной области для событий, происходящих в "
+"разных городах в пределах округа Онайда. «Штат Айдахо, США» будет "
+"административной областью, если описанные события имели место не только в "
+"округе Онайда, но и в других округах в Айдахо."
 
 #: resources/views/help/pending-changes.phtml:27
 msgid "Each user account has an option to “automatically accept changes”. When this is enabled, any changes made by that user are saved immediately. Many administrators enable this for their own user account."
@@ -7610,7 +7626,10 @@ msgstr "Если медиаобъект связан с человеком, ко
 #. I18N: Help text for the “Language” configuration setting
 #: resources/views/admin/site-preferences.phtml:90
 msgid "If a visitor to the website has not selected a preferred language in their browser preferences, or they have selected an unsupported language, then this language will be used. Typically this applies to search engines."
-msgstr "Если посетитель сайта не указан предпочитаемый язык в настройки своего браузера, или он указал неподдерживаемый язык, то будет использоваться этот язык. Как правило, этот параметр применяется для поисковых систем."
+msgstr ""
+"Если посетитель сайта не указан предпочитаемый язык в настройках своего "
+"браузера, или он указал неподдерживаемый язык, то будет использоваться этот "
+"язык. Как правило, этот параметр применяется для поисковых систем."
 
 #: resources/views/admin/users-edit.phtml:112
 msgid "If an administrator creates a user account, the verification email is not sent, and the email must be verified manually."
@@ -7619,7 +7638,9 @@ msgstr "Если администратор создаёт сам учетную
 #: resources/views/help/name.phtml:24
 #, php-format
 msgid "If an individual does not have a surname, no slashes are needed: <%s>Jón Einarsson<%s>"
-msgstr "Если человек не имеет фамилию, ни одной косой черты не потребуются: <%s>Jón Einarsson<%s>"
+msgstr ""
+"Если человек не имеет фамилии, ни одной косой черты не потребуется: <%s>Jón "
+"Einarsson<%s>"
 
 #: resources/views/help/name.phtml:21
 #, php-format
@@ -8528,7 +8549,7 @@ msgstr "Последнее изменение"
 #: resources/views/admin/control-panel.phtml:212
 #, php-format
 msgid "Last checked %s."
-msgstr "Последний раз проверял %s."
+msgstr "Последний раз проверено %s."
 
 #: app/Module/ReviewChangesModule.php:161
 msgid "Last email reminder was sent "
@@ -9822,13 +9843,13 @@ msgstr "Марокко"
 #. I18N: Help text for the “Use password” site configuration setting
 #: resources/views/admin/site-mail.phtml:127
 msgid "Most SMTP servers require a password."
-msgstr "Большенство SMTP серверов требуют пароль."
+msgstr "Большинство SMTP серверов требуют пароль."
 
 #: resources/views/modules/gedcom_stats/config.phtml:75
 #: resources/views/modules/gedcom_stats/statistics.phtml:266
 #: resources/views/modules/html/template-statistics.phtml:107
 msgid "Most common surnames"
-msgstr "Наиболее часто встречающиеся фамилии"
+msgstr "Самые распространенные фамилии"
 
 #: resources/views/admin/site-mail.phtml:188
 msgid "Most mail servers require a valid domain name."
@@ -10129,7 +10150,7 @@ msgstr "Новый тег GEDCOM"
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:146
 msgid "New York, New York, United States"
-msgstr "Нью-Йорк, Нью-Йорк, США"
+msgstr "Нью-Йорк, штат Нью-Йорк, США"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:385
@@ -11075,13 +11096,13 @@ msgstr "Восходящее Дерево"
 #. I18N: Name of a module
 #: app/Module/PedigreeMapModule.php:109
 msgid "Pedigree map"
-msgstr "Карта родословной"
+msgstr "Родословная на карте"
 
 #. I18N: %s is an individual’s name
 #: app/Module/PedigreeMapModule.php:155 app/Module/PedigreeMapModule.php:208
 #, php-format
 msgid "Pedigree map of %s"
-msgstr "Карта родословной для %s"
+msgstr "Родословная на карте для %s"
 
 #. I18N: %s is an individual’s name
 #: app/Module/PedigreeChartModule.php:148
@@ -11591,7 +11612,7 @@ msgstr "Ограничения доступа - эти настройки вли
 #: app/Report/ReportParserGenerate.php:982
 #: app/Statistics/Repository/EventRepository.php:428
 msgid "Private"
-msgstr "Приватно"
+msgstr "Скрыто"
 
 #: resources/views/admin/site-mail.phtml:219
 msgid "Private key"
@@ -11660,11 +11681,11 @@ msgstr "Кесальтенанго, Гватемала"
 
 #: resources/views/admin/trees-preferences.phtml:679
 msgid "Quick family facts"
-msgstr "Факты семьи для быстрого ввода"
+msgstr "Краткие семейные факты"
 
 #: resources/views/admin/trees-preferences.phtml:654
 msgid "Quick individual facts"
-msgstr "Факты персонны для быстрого ввода"
+msgstr "Краткие отдельные факты"
 
 #. I18N: The fifth day in the French republican calendar
 #: app/Date/FrenchDate.php:309
@@ -11856,7 +11877,7 @@ msgstr "Последние изменения"
 
 #: resources/views/calendar-page.phtml:130
 msgid "Recent years (&lt; 100 yrs)"
-msgstr "Последние года (< 100 лет)"
+msgstr "Последние годы (< 100 лет)"
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:168
@@ -12670,11 +12691,11 @@ msgstr "Послать сообщение всем пользователям"
 
 #: app/Services/MessageService.php:216
 msgid "Send a message to users who have never signed in"
-msgstr "Послать сообщение пользователям, никогда не входивших в систему"
+msgstr "Послать сообщение пользователям, никогда не входившим в систему"
 
 #: app/Services/MessageService.php:217
 msgid "Send a message to users who have not signed in for 6 months"
-msgstr "Послать сообщения пользователям, не входивших в систему более 6 месяцев"
+msgstr "Послать сообщения пользователям, не входившим в систему более 6 месяцев"
 
 #: resources/views/admin/site-mail.phtml:233
 msgid "Send a test email using these settings"
@@ -12844,7 +12865,7 @@ msgstr "Мастер установки webtrees"
 #: resources/xml/reports/individual_report.xml:388
 #: resources/xml/reports/individual_report.xml:602
 msgid "Sex"
-msgstr ""
+msgstr "Пол"
 
 #. I18N: The sixth day in the French republican calendar
 #: app/Date/FrenchDate.php:311
@@ -12892,7 +12913,7 @@ msgstr "Делиться"
 
 #: app/Module/ShareUrlModule.php:41
 msgid "Share the URL"
-msgstr "Поделитесь URL-адресом"
+msgstr "Поделитесь ссылкой"
 
 #: app/Module/ShareAnniversaryModule.php:73
 msgid "Share the anniversary of an event"
@@ -13054,7 +13075,7 @@ msgstr "Показать ссылку на скачивание в медиап�
 #. I18N: Description of the “Cookie warning” module
 #: app/Module/PrivacyPolicy.php:76
 msgid "Show a privacy policy."
-msgstr "Покажите политику конфиденциальности."
+msgstr "Показать политику конфиденциальности."
 
 #. I18N: A configuration setting
 #: resources/views/admin/site-registration.phtml:66
@@ -13080,7 +13101,7 @@ msgstr "Показать все источники"
 #. I18N: an age indicator, which can be dragged around the screen
 #: resources/views/modules/timeline-chart/page.phtml:83
 msgid "Show an age cursor"
-msgstr "Показывать курсор возраста"
+msgstr "Показывать метку возраста"
 
 #: resources/xml/reports/ahnentafel_report.xml:12
 msgid "Show children of ancestors"
@@ -13100,11 +13121,11 @@ msgstr "Показать семьи, где скончался только су
 
 #: resources/views/lists/families-table.phtml:125
 msgid "Show couples who married more than 100 years ago."
-msgstr "Показать семьи, вступившие в брак раньше ста лет назад."
+msgstr "Показать семьи, вступившие в брак более 100 лет назад."
 
 #: resources/views/lists/families-table.phtml:130
 msgid "Show couples who married within the last 100 years."
-msgstr "Показать пары вступившие в брак в последние сто лет."
+msgstr "Показать пары вступившие в брак в последние 100 лет."
 
 #: resources/views/lists/families-table.phtml:120
 msgid "Show couples with an unknown marriage date."
@@ -13126,11 +13147,11 @@ msgstr "Показать разведенных супругов."
 
 #: resources/views/lists/individuals-table.phtml:137
 msgid "Show individuals born more than 100 years ago."
-msgstr "Показать персон, родившихся раньше ста лет назад."
+msgstr "Показать персон, родившихся больше 100 лет назад."
 
 #: resources/views/lists/individuals-table.phtml:142
 msgid "Show individuals born within the last 100 years."
-msgstr "Показать людей родившихся в последние сто лет."
+msgstr "Показать людей родившихся в последние 100 лет."
 
 #: resources/views/lists/individuals-table.phtml:114
 msgid "Show individuals who are alive or couples where both partners are alive."
@@ -13139,15 +13160,15 @@ msgstr "Показать только живых персон или семьи,
 #: resources/views/lists/families-table.phtml:101
 #: resources/views/lists/individuals-table.phtml:119
 msgid "Show individuals who are dead or couples where both partners are dead."
-msgstr "Показать только скончавшихся персон или семьи, где оба супруга скончались."
+msgstr "Показать скончавшихся персон или семьи, где оба супруга скончались."
 
 #: resources/views/lists/individuals-table.phtml:124
 msgid "Show individuals who died more than 100 years ago."
-msgstr "Показать персон, скончавшихся раньше ста лет назад."
+msgstr "Показать персон, скончавшихся больше 100 лет назад."
 
 #: resources/views/lists/individuals-table.phtml:129
 msgid "Show individuals who died within the last 100 years."
-msgstr "Показать персон, скончавшихся до ста лет назад включительно."
+msgstr "Показать персон, скончавшихся до 100 лет назад включительно."
 
 #. I18N: A configuration setting
 #: resources/views/admin/site-preferences.phtml:99
@@ -13586,7 +13607,7 @@ msgstr "Сын"
 #: app/Module/InteractiveTree/TreeView.php:363
 #, php-format
 msgid "Son of %s"
-msgstr "Сын от %s"
+msgstr "Сын %s"
 
 #: app/CustomTags/Gedcom7.php:84 app/CustomTags/Gedcom7.php:113
 #: app/CustomTags/TheMasterGenealogist.php:52
@@ -14005,7 +14026,7 @@ msgstr "Фамилии склоняются указывая пол и семе�
 
 #: app/SurnameTradition/PolishSurnameTradition.php:68
 msgid "Surnames are inflected to indicate an individual’s sex."
-msgstr "Фамилии склонены указывая на пол человека."
+msgstr "Фамилии склоняются указывая пол человека."
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:190
@@ -14222,7 +14243,13 @@ msgstr "<b>имя</b> поле содержит индивидуальные п�
 
 #: resources/views/help/surname.phtml:10
 msgid "The <b>surname</b> field contains a name that is used for sorting and grouping. It can be different to the individual’s actual surname which is always taken from the <b>name</b> field. This field can be used to sort surnames with or without a prefix (Gogh / van Gogh) and to group spelling variations or inflections (Kowalski / Kowalska). If an individual needs to be listed under more than one surname, each name should be separated by a comma."
-msgstr "<b>фамилия</b> поле содержит имя, которое используется для сортировки и группировки. Он может быть различным для отдельных фактических фамилия, которая всегда берется из <b>имя</b> поле. Это поле может использоваться для сортировки фамилий с или без префикса (Gogh / van Gogh) и группы вариантов написания, или флексии (Kowalski / Ковальской). Если человек должен находиться в списке более одной фамилии, имя каждого должны быть разделены запятой."
+msgstr ""
+"Поле <b>фамилии</b> содержит имя, используемое для сортировки и группировки. "
+"Оно может быть различным для отдельных фактических фамилий, которые всегда "
+"берутся из поля <b>имя</b>. Это поле может использоваться для сортировки "
+"фамилий с или без префикса (Гог / ван Гог) и группы вариантов написания, или "
+"флексии (Ковальски / Ковальска). Если человек должен находиться в списке под "
+"более чем одной фамилией, имена должны быть разделены запятой."
 
 #: app/Http/RequestHandlers/SynchronizeTrees.php:96
 #, php-format
@@ -14275,7 +14302,9 @@ msgstr "Администратор сайта %s одобрил Вашу зая�
 
 #: resources/views/verify-success-page.phtml:22
 msgid "The administrator has been informed. As soon as they give you permission to sign in, you can sign in with your username and password."
-msgstr "Администратор был проинформирован. Как только он даст разрешение на вход в систему, Вы можете войти, используя имя пользователя и пароль."
+msgstr ""
+"Администратор был проинформирован. Как только он даст разрешение на вход в "
+"систему, Вы сможете войти, используя имя пользователя и пароль."
 
 #. I18N: Description of the “Calendar” module
 #: app/Module/CalendarMenuModule.php:53
@@ -14693,7 +14722,7 @@ msgstr "Заявитель создан"
 #: resources/views/help/name.phtml:15
 #, php-format
 msgid "The surname is enclosed by slashes: <%s>John Paul /Smith/<%s>"
-msgstr "Фамилия заключена косыми чертами: <%s>Иван Иванович /Иванов/<%s>"
+msgstr "Фамилия заключена в косые черты: <%s>Иван Иванович /Иванов/<%s>"
 
 #: resources/views/admin/site-preferences.phtml:56
 #: resources/views/admin/users-edit.phtml:142
@@ -14737,7 +14766,7 @@ msgstr "Неправильное имя пользователя или паро
 #. I18N: Help text for the "Username" site configuration setting
 #: resources/views/admin/site-mail.phtml:141
 msgid "The username required for authentication with the SMTP server."
-msgstr "Имя пользователя, необходимое для аутентификации с SMTP сервером ."
+msgstr "Имя пользователя, необходимое для аутентификации с SMTP сервером."
 
 #: app/Http/RequestHandlers/EmailPreferencesAction.php:91
 #: app/Http/RequestHandlers/ModulesAnalyticsAction.php:45
@@ -14962,7 +14991,10 @@ msgstr "Это имя файла несовместимо с форматом ф
 #. I18N: Help text for the "Data folder" site configuration setting
 #: resources/views/admin/site-preferences.phtml:33
 msgid "This folder will be used by webtrees to store media files, GEDCOM files, temporary files, etc. These files may contain private data, and should not be made available over the internet."
-msgstr "Эта папка будет использоваться Webtrees для хранения медиафайлов, файлов GEDCOM, временные файлы и др. Эти файлы могут содержать личные данные, и не должны быть доступны через интернет."
+msgstr ""
+"Эта папка будет использоваться Webtrees для хранения медиафайлов, файлов "
+"GEDCOM, временных файлов и др. Эти файлы могут содержать личные данные, и не "
+"должны быть доступны через интернет."
 
 #. I18N: Help text for the “Media folder” configuration setting
 #: resources/views/admin/trees-preferences.phtml:252
@@ -15113,7 +15145,9 @@ msgstr "Должно быть не менее шести символов с у�
 #: resources/views/admin/site-mail.phtml:63
 #: resources/views/admin/site-mail.phtml:77
 msgid "This name is used in the “From” field, when sending automatic emails from this server."
-msgstr "Это имя используется в поле «От кого», при отправки автоматических сообщений от этого сервера."
+msgstr ""
+"Это имя используется в поле «От кого», при отправке автоматических сообщений "
+"от этого сервера."
 
 #: app/Auth.php:380 app/Auth.php:409
 msgid "This note does not exist or you do not have permission to view it."
@@ -15561,8 +15595,8 @@ msgstr "Слишком много запросов. Попробуйте еще 
 #, php-format
 msgid "Top %s given name"
 msgid_plural "Top %s given names"
-msgstr[0] "%s Самые распространенное имя"
-msgstr[1] "%s самыx распространенных имен"
+msgstr[0] "%s Самое распространенное имя"
+msgstr[1] "%s самые распространенные имена"
 msgstr[2] "%s самыx распространенных имен"
 
 #. I18N: Title for a list of the most common surnames, %s is a number. Note that a separate translation exists when %s is 1
@@ -15583,7 +15617,7 @@ msgstr "Самые распространенные имена"
 #: app/Module/TopGivenNamesModule.php:48
 #: resources/views/modules/statistics-chart/names.phtml:45
 msgid "Top given names"
-msgstr "Наиболее часто встречающиеся имена и отчества"
+msgstr "Самые распространенные имена"
 
 #. I18N: i.e. most popular surname.
 #: app/Module/TopSurnamesModule.php:193
@@ -15594,7 +15628,7 @@ msgstr "Распространенная фамилия"
 #: app/Module/TopSurnamesModule.php:72
 #: resources/views/modules/statistics-chart/names.phtml:25
 msgid "Top surnames"
-msgstr "Наиболее часто встречающиеся фамилии"
+msgstr "Распространеные фамилии"
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:199
@@ -16046,7 +16080,9 @@ msgstr "Загрузить медиафайлы"
 
 #: resources/views/admin/media-upload.phtml:25
 msgid "Upload one or more media files from your local computer. Media files can be pictures, video, audio, or other formats."
-msgstr "Загрузить один или более медиафайла с Вашего локального компьютера. Медиафайлы могут содержать фотографии, видео, аудио, или другие медиаформаты."
+msgstr ""
+"Загрузить один или более медиафайл с Вашего локального компьютера. "
+"Медиафайлы могут содержать фотографии, видео, аудио, или другие медиаформаты."
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:514
@@ -16876,7 +16912,7 @@ msgstr "добавить место"
 #. I18N: The name given to a child by its adoptive parents
 #: app/Elements/NameType.php:71
 msgid "adopted name"
-msgstr "имя после адопции"
+msgstr "принятое имя"
 
 #: app/Elements/GeneatiqueAct.php:44
 msgid "after"
@@ -17227,7 +17263,7 @@ msgstr "дочь"
 
 #: resources/xml/reports/descendancy_report.xml:226
 msgid "daughter of"
-msgstr "дочь от"
+msgstr "дочь"
 
 #: app/Services/RelationshipService.php:515
 msgctxt "child’s wife"
@@ -19492,7 +19528,7 @@ msgstr "последняя"
 #: resources/views/admin/trees-preferences.phtml:570
 msgctxt "Show the [first/last] [N] parts of a place name."
 msgid "last"
-msgstr "последнии"
+msgstr "последние"
 
 #: app/Module/PedigreeChartModule.php:362
 #: app/Module/PedigreeChartModule.php:370
@@ -20446,7 +20482,7 @@ msgstr "сын"
 
 #: resources/xml/reports/descendancy_report.xml:295
 msgid "son of"
-msgstr "сын от"
+msgstr "сын"
 
 #: app/Services/RelationshipService.php:509
 msgctxt "child’s husband"

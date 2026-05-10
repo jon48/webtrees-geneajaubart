@@ -57,7 +57,7 @@
 		"ext-session" : "*",
 		"ext-xml" : "*",
         "aura/router": "3.4.2",
-        "doctrine/dbal": "3.10.4",
+        "doctrine/dbal": "3.10.5",
         "ezyang/htmlpurifier": "4.19.0",
 		"fig/http-message-util" : "1.1.5",
 		"fisharebest/algorithm" : "1.6.0",
@@ -73,7 +73,7 @@
 		"jon48/webtrees-lib" : "dev-main-2.1 as dev-main",
 		"jon48/webtrees-mod-maj-geodata-france" : "dev-main",
 		"jon48/webtrees-mod-translationtool" : "dev-main",
-        "league/commonmark": "2.8.0",
+        "league/commonmark": "2.8.2",
         "league/flysystem": "2.5.0",
 		"league/flysystem-ziparchive" : "2.3.1",
         "middlewares/client-ip": "2.1.0",
@@ -94,7 +94,7 @@
         "symfony/mailer": "5.4.45",
         "symfony/polyfill-mbstring": "1.33.0",
         "symfony/polyfill-php80": "1.33.0",
-        "tecnickcom/tcpdf": "6.10.1"
+        "tecnickcom/tcpdf": "6.11.2"
 	},
 	"require-dev" : {
 		"ext-dom": "*",
@@ -102,12 +102,11 @@
 		"ext-pdo_sqlite": "*",
 		"ext-sqlite3": "*",
 		"bamarni/composer-bin-plugin": "^1.8",
-        "composer/composer": "2.9.3",
-		"consolidation/robo": "^3.0",
+        "composer/composer": "2.9.6",
 		"league/flysystem-memory": "2.0.6",
         "php-coveralls/php-coveralls": "2.9.1",
-        "phpstan/phpstan": "2.1.33",
-        "phpunit/phpunit": "9.6.31",
+        "phpstan/phpstan": "2.1.46",
+        "phpunit/phpunit": "9.6.34",
         "squizlabs/php_codesniffer": "4.0.1"
 	},
 	"suggest" : {
@@ -175,7 +174,7 @@
 		"webtrees-geneajaubart:build" : "Load all required dependencies, and build the MyArtJaub modules' assets.",
 		"webtrees-geneajaubart:package" : "Create a package file for distribution. Add `-- version commit` for creating a versioned archive against a specific commit.",
 		"webtrees:build" : "Create a distribution file (webtrees.zip)",
-		"webtrees:check" : "Run various static analysis tools",
+        "webtrees:ci": "Run continuous integration tools",
 		"webtrees:coverage" : "Generate test coverage report",
 		"webtrees:lang" : "Compile the language files (messages.php)",
 		"webtrees:po" : "Update the language (webtrees.pot, *.po)"

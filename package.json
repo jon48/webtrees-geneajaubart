@@ -13,7 +13,7 @@
     "postcss-image-inliner": "7.0.1",
     "postcss-import": "16.1.1",
     "postcss-rtlcss": "5.7.1",
-    "stylelint": "^17.4.0",
+    "stylelint": "^17.11.0",
     "stylelint-config-sass-guidelines": "^13.0.0",
     "stylelint-config-standard": "^40.0.0"
   },
