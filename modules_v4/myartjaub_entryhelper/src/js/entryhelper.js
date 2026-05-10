@@ -2,10 +2,10 @@
  * JS Library - MyArtJaub Entry Helper module
  *
  * webtrees-MyArtJaub
- * Copyright (C) 2024-2025 Jonathan Jaubart
+ * Copyright (C) 2024-2026 Jonathan Jaubart
  *
  * Based on webtrees: online genealogy
- * Copyright (C) 2009-2025 webtrees development team
+ * Copyright (C) 2009-2026 webtrees development team
  *
  * This file is part of webtrees-MyArtJaub
  *
