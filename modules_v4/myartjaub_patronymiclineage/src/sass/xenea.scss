@@ -21,7 +21,7 @@
  * along with webtrees-MyArtJaub. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
+@use 'base';
 
 .menu-maj-patrolineage::before {content: url('xenea/menu-list-lineages.png');}
 

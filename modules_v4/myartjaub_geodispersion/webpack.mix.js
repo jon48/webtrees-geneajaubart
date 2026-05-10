@@ -27,10 +27,6 @@ const postcssImageInliner = require('postcss-image-inliner')({
   maxFileSize: 0
 });
 
-// https://github.com/postcss/postcss-custom-properties
-// Enable CSS variables in IE
-const postcssCustomProperties = require('postcss-custom-properties')();
-
 mix
   .setPublicPath('resources')
   .js('src/js/geodispersion.js', 'js/geodispersion.min.js')
@@ -47,8 +43,7 @@ mix
     postCss: [
       postcssRtl,
       postcssAutoprefixer,
-      postcssImageInliner,
-      postcssCustomProperties
+      postcssImageInliner
     ]
   })
   .clean({

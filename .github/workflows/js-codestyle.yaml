@@ -14,15 +14,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
           extensions: gd,intl,mbstring,sqlite,zip
-          coverage: disable
+          coverage: none
 
-      - run: composer install --no-progress --ignore-platform-reqs
+      - run: composer install --no-progress
 
       - run: composer webtrees-geneajaubart:lintjs

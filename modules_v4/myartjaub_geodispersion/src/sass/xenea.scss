@@ -21,7 +21,7 @@
  * along with webtrees-MyArtJaub. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
+@use 'base';
 
 /* stylelint-disable @stylistic/block-opening-brace-space-before */
 .menu-maj-geodispersion::before     {content: url('xenea/menu-geodispersion.png');}

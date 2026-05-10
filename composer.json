@@ -124,6 +124,7 @@
 		"webtrees-geneajaubart:package" : "./vendor-bin/robo/vendor/bin/robo package",
 		"webtrees-geneajaubart:lintjs" : "./vendor-bin/robo/vendor/bin/robo lint:semistandard",
 		"webtrees-geneajaubart:updatenpm" : "./vendor-bin/robo/vendor/bin/robo update:npm-modules",
+		"webtrees-geneajaubart:phpcs" : "vendor/bin/phpcs -s --exclude=Generic.Files.LineEndings",
 		"webtrees:build" : [
 			"rm -Rf webtrees/",
 			"git archive --prefix=webtrees/ HEAD --format=tar | tar -x",
