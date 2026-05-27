@@ -89,7 +89,7 @@
         "psr/http-server-middleware": "1.0.2",
 		"ramsey/uuid" : "4.2.3",
         "sabre/vobject": "4.5.8",
-        "symfony/cache": "5.4.46",
+        "symfony/cache": "5.4.52",
         "symfony/expression-language": "5.4.45",
         "symfony/mailer": "5.4.45",
         "symfony/polyfill-mbstring": "1.33.0",
