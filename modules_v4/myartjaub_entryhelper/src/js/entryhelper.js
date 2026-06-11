@@ -28,7 +28,7 @@
 // Add required icons to Font-Awesome
 import { library } from '@fortawesome/fontawesome-svg-core';
 
-import { faPaste } from '@fortawesome/free-regular-svg-icons';
+import { faPaste } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faPaste);
 
@@ -172,8 +172,8 @@ library.add(faPaste);
   const addCitationFillIcons = (_, labelElement) => {
     const srcId = labelElement.getAttribute('for').replace('-ts-label', '');
 
-    labelElement.append(createFontAwesomeIcon(['far', 'fa-copy', 'fa-fw'], I18N.citationCopy, () => majEntryHelper.persistSourceCitation(srcId)));
-    labelElement.append(createFontAwesomeIcon(['far', 'fa-paste', 'fa-fw'], I18N.citationPaste, () => majEntryHelper.fillSourceCitation(srcId)));
+    labelElement.append(createFontAwesomeIcon(['fa', 'fa-copy', 'fa-fw'], I18N.citationCopy, () => majEntryHelper.persistSourceCitation(srcId)));
+    labelElement.append(createFontAwesomeIcon(['fa', 'fa-paste', 'fa-fw'], I18N.citationPaste, () => majEntryHelper.fillSourceCitation(srcId)));
   };
 
   /** API Functions */
