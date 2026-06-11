@@ -64,7 +64,7 @@
         "fisharebest/ext-calendar": "2.6.0",
 		"fisharebest/flysystem-chroot-adapter" : "2.0.0",
         "fisharebest/localization": "1.17.0",
-        "guzzlehttp/guzzle": "7.10.0",
+        "guzzlehttp/guzzle": "^7.10.0",
         "illuminate/container": "8.83.27",
         "illuminate/database": "8.83.27",
         "illuminate/support": "8.83.27",
@@ -89,12 +89,12 @@
         "psr/http-server-middleware": "1.0.2",
 		"ramsey/uuid" : "4.2.3",
         "sabre/vobject": "4.5.8",
-        "symfony/cache": "5.4.46",
-        "symfony/expression-language": "5.4.45",
-        "symfony/mailer": "5.4.45",
-        "symfony/polyfill-mbstring": "1.33.0",
-        "symfony/polyfill-php80": "1.33.0",
-        "tecnickcom/tcpdf": "6.11.2"
+        "symfony/cache": "^5.4.46",
+        "symfony/expression-language": "^5.4.45",
+        "symfony/mailer": "^5.4.45",
+        "symfony/polyfill-mbstring": "^1.33.0",
+        "symfony/polyfill-php80": "^1.33.0",
+        "tecnickcom/tcpdf": "^6.11.2"
 	},
 	"require-dev" : {
 		"ext-dom": "*",
