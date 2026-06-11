@@ -27,8 +27,8 @@
     "postcss-rtlcss": "^6.0.0",
     "sass": "^1.32.8",
     "sass-loader": "^17.0.0",
-    "webpack": "^5.23.0",
-    "webpack-cli": "^7.0.2"
+    "webpack": "5.106.2",
+    "webpack-cli": "7.0.2"
   },
   "overrides": {
     "laravel-mix": {
