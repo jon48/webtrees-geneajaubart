@@ -73,7 +73,7 @@
 		"jon48/webtrees-lib" : "dev-main-2.1 as dev-main",
 		"jon48/webtrees-mod-maj-geodata-france" : "dev-main",
 		"jon48/webtrees-mod-translationtool" : "dev-main",
-        "league/commonmark": "2.8.2",
+        "league/commonmark": "2.9.0",
         "league/flysystem": "2.5.0",
 		"league/flysystem-ziparchive" : "2.3.1",
         "middlewares/client-ip": "2.1.0",
